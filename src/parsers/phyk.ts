@@ -23,15 +23,21 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
         let currentDayDate: undefined|Moment = undefined;
         children.forEach(child => {
             if (child.tagName.toLowerCase() === 'h2' && !currentDayDate) {
-                let regexResult = dateRegex.exec(child.textContent);
-                if (regexResult != null)
-                    currentDayDate = moment(regexResult[0], "DD.MM.YYYY").startOf('day');
+                let textContent = child.textContent;
+                if (textContent) {
+                    let regexResult = dateRegex.exec(textContent);
+                    if (regexResult != null)
+                        currentDayDate = moment(regexResult[0], "DD.MM.YYYY").startOf('day');
+                }
             } else if (child.tagName.toLowerCase() === 'ul' && currentDayDate !== undefined) {
                 let meals: Meal[] = [];
                 let mealLi = child.querySelectorAll('li');
                 mealLi.forEach(meal => {
-                    meal.textContent = meal.textContent.trim();
-                    meals.push(new Meal(meal.textContent, HashUtils.sha1Digest(type+'_'+meal.textContent)));
+                    let mealText = meal.textContent;
+                    if (mealText) {
+                        mealText = mealText.trim();
+                        meals.push(new Meal(mealText, HashUtils.sha1Digest(type+'_'+mealText)));
+                    }
                 });
                 items.push(new Day(currentDayDate.toISOString(true), [new Menu('Lounas', meals)]));
                 currentDayDate = undefined;

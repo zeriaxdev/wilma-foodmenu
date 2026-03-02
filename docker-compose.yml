@@ -9,5 +9,5 @@ services:
     environment:
       SKIP_SELENIUM_QUIT: ${SKIP_SELENIUM_QUIT}
     ports:
-      - "8081:3001"
+      - "3000:3000"
     restart: unless-stopped

@@ -35,7 +35,8 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
     let document = parser.parse(html);
 
     let currentDayDate: undefined | Moment = undefined;
-    let week = document.querySelector(".ruokalista-viikko").textContent;
+    let weekElement = document.querySelector(".ruokalista-viikko");
+    let week = weekElement?.textContent || null;
 
     let contentBox = document.querySelector(".ruoka-template");
     if (contentBox !== null) {
@@ -46,15 +47,18 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
         children.forEach(child => {
             let days = child.querySelectorAll('.ruoka-header-pvm');
             days.forEach(day => {
-                let regexResult = dateRegex.exec(day.textContent)
+                let dayText = day.textContent;
+                if (dayText) {
+                    let regexResult = dateRegex.exec(dayText);
 
-                if (regexResult != null && week) {
-                    weekdays.push(regexResult[0]);
+                    if (regexResult != null && week) {
+                        weekdays.push(regexResult[0]);
 
-                    for (let i = 0; i < weekdays.length; i++) {
-                        let newDay = convertDayName(weekdays[i].toLowerCase());
-                        
-                        currentDayDate = moment().day(newDay).week(parseInt(week, 10)).startOf('day');
+                        for (let i = 0; i < weekdays.length; i++) {
+                            let newDay = convertDayName(weekdays[i].toLowerCase());
+
+                            currentDayDate = moment().day(newDay).week(parseInt(week, 10)).startOf('day');
+                        }
                     }
                 }
             })
@@ -62,17 +66,26 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
             let meals: Meal[] = [];
             let mealNormal = child.querySelectorAll('.ruoka-header-ruoka');
             mealNormal.forEach(meal => {
-                meal.textContent = meal.textContent.trim();
-                meals.push(new Meal(HashUtils.sha1Digest(type + '_' + meal.textContent), meal.textContent));
+                let mealText = meal.textContent;
+                if (mealText) {
+                    mealText = mealText.trim();
+                    meals.push(new Meal(HashUtils.sha1Digest(type + '_' + mealText), mealText));
+                }
             });
 
             let mealVege = child.querySelectorAll('.ruoka-header-kasvisruoka');
             mealVege.forEach(meal => {
-                meal.textContent = meal.textContent.trim();
-                meals.push(new Meal(HashUtils.sha1Digest(type + '_' + meal.textContent),
-                    meal.textContent.replace(/\s+Kasvisruoka/g, "")));
+                let mealText = meal.textContent;
+                if (mealText) {
+                    mealText = mealText.trim();
+                    meals.push(new Meal(HashUtils.sha1Digest(type + '_' + mealText),
+                        mealText.replace(/\s+Kasvisruoka/g, "")));
+                }
             });
-            items.push(new Day(currentDayDate?.toISOString(true), [new Menu('Lounas', meals)]));
+
+            if (meals.length > 0) {
+                items.push(new Day(currentDayDate?.toISOString(true), [new Menu('Lounas', meals)]));
+            }
             currentDayDate = undefined;
         });
         return { menu: items, diets: [] };

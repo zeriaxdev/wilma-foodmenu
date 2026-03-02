@@ -21,9 +21,9 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
         let children = contentBox.querySelectorAll('tbody>tr');
         children.forEach(child => {
             let columns = child.querySelectorAll('td');
-            if (columns.length > 2) {
+            if (columns.length > 2 && columns[1] && columns[2]) {
                 let date = columns[1].textContent;
-                if (date.match(dateRegex)) {
+                if (date && date.match(dateRegex)) {
                     let regexResult = dateRegex.exec(date);
                     if (regexResult !== null) {
                         let ISODate = moment(regexResult[0], "DD.MM.YYYY").startOf('day').toISOString(true);
@@ -32,7 +32,7 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
                             if (textElem instanceof HTMLElement && textElem.tagName.toLowerCase() === 'br') {
                                 reconstructedContent += '\n';
 
-                            } else if (textElem instanceof TextNode)  {
+                            } else if (textElem instanceof TextNode && textElem.textContent)  {
                                 reconstructedContent += textElem.textContent;
                             }
                         });

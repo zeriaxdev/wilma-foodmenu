@@ -13,6 +13,41 @@ let httpClient = new Http();
 
 
 
+    /**
+ * @swagger
+ * /ael/menu:
+ *   get:
+ *     summary: Get AEL restaurant menu
+ *     description: Retrieves the menu for AEL restaurant from ISS food services
+ *     tags: [Restaurants]
+ *     responses:
+ *       200:
+ *         description: Menu retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   description: Parsed menu data
+ *       500:
+ *         description: Server error or unable to parse menu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 cause:
+ *                   type: string
+ *                   example: "Unable to parse menu!"
+ */
 export function handleAEL(req: Request, res: Response) {
     httpClient.get(url, (error, response) => {
         if (error || response == undefined) {
