@@ -1,4 +1,4 @@
-version: "2"
+version: "3.8"
 
 services:
   foodmenu:
@@ -7,7 +7,14 @@ services:
     image: foodmenu_server
     shm_size: '2gb'
     environment:
-      SKIP_SELENIUM_QUIT: ${SKIP_SELENIUM_QUIT}
+      PORT: 3000
+      SKIP_SELENIUM_QUIT: ${SKIP_SELENIUM_QUIT:-}
     ports:
       - "3000:3000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/menus"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
