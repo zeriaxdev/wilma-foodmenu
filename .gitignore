@@ -1,11 +1,28 @@
-build
-package-lock.json
-node_modules
-.idea
-tests/testconfig.json
-testconfig.json
-.wplus_data
-dist
-dbconfig.json
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+# Environment
 .env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python venv (leftover)
+bin/
+lib/
+include/
+pyvenv.cfg
+
+# Misc
+.wplus_data/
 *-firebase-adminsdk-*.json
+testconfig.json

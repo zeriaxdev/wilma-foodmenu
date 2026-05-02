@@ -65,7 +65,7 @@ export function handleLoviisaPk(req: Request, res: Response) {
     if (parsedPDFLink !== undefined) {
       httpClient.get(parsedPDFLink, (error1, response1) => {
         if (error1 || response1 == undefined) {
-          errorResponse(res, 500, error);
+          errorResponse(res, 500, error1);
           return;
         }
         parse(response1.body, (items) => {

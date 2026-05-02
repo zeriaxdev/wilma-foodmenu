@@ -143,6 +143,22 @@ export function handleISSMenu(req: Request, res: Response) {
   }
   let url = req.params.url;
   url = url.replace("iss://", "https://");
+  if (!url.match(urlRegex)) {
+    responseStatus(res, 400, false, { cause: "Invalid or malformed URL!" });
+    return;
+  }
+  try {
+    const parsedUrl = new URL(url);
+    if (!parsedUrl.hostname.endsWith("iss.fi")) {
+      responseStatus(res, 400, false, {
+        cause: "URL must point to an ISS domain!",
+      });
+      return;
+    }
+  } catch {
+    responseStatus(res, 400, false, { cause: "Invalid or malformed URL!" });
+    return;
+  }
   let menuKeyHash = HashUtils.sha1Digest(url + "_" + type);
   userCache
     .getItem(menuKeyHash)

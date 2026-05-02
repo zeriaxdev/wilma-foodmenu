@@ -96,7 +96,16 @@ export function handleLookiKbp(req: Request, res: Response) {
     errorResponse(res, 400, "Menu endpoint is missing!");
     return;
   }
-  httpClient.get(url + req.params.endpoint, (error, response) => {
+  const endpoint = req.params.endpoint;
+  if (
+    endpoint.includes("..") ||
+    endpoint.includes("/") ||
+    !/^[a-zA-Z0-9_-]+$/.test(endpoint)
+  ) {
+    errorResponse(res, 400, "Invalid endpoint!");
+    return;
+  }
+  httpClient.get(url + endpoint, (error, response) => {
     if (error || response == undefined) {
       errorResponse(res, 500, error);
       return;
@@ -126,7 +135,7 @@ export function handleLookiKbp(req: Request, res: Response) {
         menuLinks,
         () => {
           responseStatus(res, 200, true, { menu: items, diets });
-        }
+        },
       );
       linkIterator.start();
     } else {

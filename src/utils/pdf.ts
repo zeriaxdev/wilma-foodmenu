@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 2022 wilmaplus-foodmenu, developed by @developerfromjokela, for Wilma Plus mobile app
+ * Modifications Copyright (c) 2026 oppix-foodmenu, developed by@zeriaxdev
  */
 
-
-import {removeImages} from "ghostscript-node"
-import {Buffer} from "buffer";
+import { removeImages } from "ghostscript-node";
+import { Buffer } from "buffer";
 
 /**
  * Removes images from PDF document, to temporarily fix a PDF parsing bug
  * @returns {Promise<Buffer>}
  */
 export async function removeImagesFromPDF(pdf: Buffer) {
-    return await removeImages(pdf)
+  return await removeImages(pdf);
 }

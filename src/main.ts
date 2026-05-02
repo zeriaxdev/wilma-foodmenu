@@ -5,7 +5,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import swaggerJsdoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import { apiReference } from "@scalar/express-api-reference";
 
 const PORT = process.env.PORT || 3001;
 const SELENIUM_ARGS = process.env.SELENIUM_ARGS || null;
@@ -55,7 +55,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ["./src/handlers/*.ts"], // Path to the API docs
+  apis: ["./src/handlers/*.ts", "./build/handlers/*.js"], // Path to the API docs
 };
 
 const swaggerSpecs = swaggerJsdoc(swaggerOptions);
@@ -63,8 +63,20 @@ const swaggerSpecs = swaggerJsdoc(swaggerOptions);
 let app = express();
 app.use(bodyParser.json());
 
-// Swagger UI
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+// Serve raw OpenAPI spec
+app.get("/api-docs/openapi.json", (req, res) => {
+  res.json(swaggerSpecs);
+});
+
+// Scalar API Reference
+app.use(
+  "/api-docs",
+  apiReference({
+    spec: {
+      content: swaggerSpecs,
+    },
+  }),
+);
 
 app.use("/asikkala/menu", asikkala);
 app.use("/syk/menu", syk);
@@ -85,12 +97,12 @@ app.use("/iss/menu/:url", issMenu);
 app.use("/aroma/:url/restaurants/:id", (req, res) =>
   req?.params?.url == "aromiv2://matilda"
     ? matilda.getRestaurantPage(req, res)
-    : aromaV2.getRestaurantPage(req, res)
+    : aromaV2.getRestaurantPage(req, res),
 );
 app.use("/aroma/:url/restaurants", (req, res) =>
   req?.params?.url == "aromiv2://matilda"
     ? matilda.getMenuOptions(req, res)
-    : aromaV2.getMenuOptions(req, res)
+    : aromaV2.getMenuOptions(req, res),
 );
 app.use("/loviisa/paivakoti/menu", loviisa.handleLoviisaPk);
 app.use("/jamix/restaurants", jamix.getMenuOptions);
@@ -107,6 +119,6 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log("Listening to port " + PORT);
   console.log(
-    `Swagger documentation available at http://localhost:${PORT}/api-docs`
+    `API documentation available at http://localhost:${PORT}/api-docs`,
   );
 });

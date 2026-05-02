@@ -34,7 +34,7 @@ export async function getMenuJSON(buildId: string) {
 
 export async function getMenuBaseUrl(buildId: string, id: string) {
   let data = await fetch(
-    baseUrl + `_next/data/${buildId}/fi/meals/week/${id}.json`
+    baseUrl + `_next/data/${buildId}/fi/meals/week/${id}.json`,
   );
   return await data.json();
 }
@@ -42,16 +42,90 @@ export async function getMenuBaseUrl(buildId: string, id: string) {
 export async function getMenuData(
   buildId: string,
   id: string,
-  query: string = ""
+  query: string = "",
 ) {
   let data = await fetch(
-    baseUrl + `_next/data/${buildId}/fi/meals/week/${id}.json${query}`
+    baseUrl + `_next/data/${buildId}/fi/meals/week/${id}.json${query}`,
   );
   return await data.json();
 }
 
 /**
  * Get Restaurant data with meals
+ *
+ * @swagger
+ * /aroma/aromiv2://matilda/restaurants/{id}:
+ *   get:
+ *     summary: Get Matilda restaurant menu
+ *     description: Retrieves the menu and meal data for a specific restaurant from the Matilda food platform
+ *     tags: [Matilda]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Restaurant ID from Matilda
+ *     responses:
+ *       200:
+ *         description: Menu retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 menu:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     description: Menu data for each day
+ *                 diets:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                   example: []
+ *       400:
+ *         description: Missing required parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 cause:
+ *                   type: string
+ *                   example: "Required parameters not specified!"
+ *       404:
+ *         description: Restaurant not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 cause:
+ *                   type: string
+ *                   example: "Restaurant not found!"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 cause:
+ *                   type: string
+ *
  * @param req
  * @param res
  */
@@ -88,7 +162,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
         let json = await getMenuData(
           buildId,
           realMenuId,
-          "?" + query + "&id=" + realMenuId
+          "?" + query + "&id=" + realMenuId,
         );
         days = [...days, ...(await parseMatildaModel(json?.pageProps?.meals))];
       }
@@ -110,6 +184,45 @@ export async function getRestaurantPage(req: Request, res: Response) {
 
 /**
  * Get restaurants
+ *
+ * @swagger
+ * /aroma/aromiv2://matilda/restaurants:
+ *   get:
+ *     summary: Get Matilda restaurants list
+ *     description: Retrieves a list of all available restaurants/distributors from the Matilda food platform
+ *     tags: [Matilda]
+ *     responses:
+ *       200:
+ *         description: Restaurants list retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 restaurants:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 cause:
+ *                   type: string
  */
 export async function getMenuOptions(req: Request, res: Response) {
   try {
@@ -118,7 +231,7 @@ export async function getMenuOptions(req: Request, res: Response) {
     let restaurants: Restaurant[] = [];
     if (menuJson?.pageProps?.distributors) {
       restaurants = menuJson.pageProps.distributors.map(
-        (i: { id: string; name: string }) => new Restaurant(i.id, i.name)
+        (i: { id: string; name: string }) => new Restaurant(i.id, i.name),
       );
     }
     responseStatus(res, 200, true, { restaurants });

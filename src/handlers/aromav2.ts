@@ -92,11 +92,11 @@ const getSeleniumDriver = () => {
  */
 async function getRestaurantList(driver: ThenableWebDriver) {
   let restaurantDropdown = await driver.findElement(
-    By.id("MainContent_RestaurantDropDownList")
+    By.id("MainContent_RestaurantDropDownList"),
   );
   let restaurants: Restaurant[] = [];
   let options: WebElement[] = await restaurantDropdown.findElements(
-    By.css("option")
+    By.css("option"),
   );
   for (let item of options.splice(1, options.length - 1)) {
     try {
@@ -148,13 +148,13 @@ async function selectRestaurant(driver: ThenableWebDriver, id: string) {
 
   // Open picker
   let restaurantDropDown = await driver.findElement(
-    By.id("MainContent_RestaurantDropDownList-button")
+    By.id("MainContent_RestaurantDropDownList-button"),
   );
   await restaurantDropDown.click();
 
   // Get picker options
   let restaurantList = await driver.findElement(
-    By.id("MainContent_RestaurantDropDownList-menu")
+    By.id("MainContent_RestaurantDropDownList-menu"),
   );
   let listItems = await restaurantList.findElements(By.css("li"));
 
@@ -180,13 +180,13 @@ async function getRestaurantPDFLink(driver: ThenableWebDriver) {
     // First selection item does not produce anything, choosing another one.
     let middleDateBtn = await driver.findElement(
       By.id(
-        "MainContent_RestaurantDateRangesFilterHeadersDataList_RestaurantDateRangesFilterHeadersLinkButton_1"
-      )
+        "MainContent_RestaurantDateRangesFilterHeadersDataList_RestaurantDateRangesFilterHeadersLinkButton_1",
+      ),
     );
     await middleDateBtn.click();
 
     let progressElem = await driver.wait(
-      until.elementLocated(By.id("MainContent_UpdateProgress2"))
+      until.elementLocated(By.id("MainContent_UpdateProgress2")),
     );
     await driver.wait(until.stalenessOf(progressElem));
 
@@ -250,11 +250,11 @@ async function getRestaurantPDFLinkDirect(url: string, restaurantId: string) {
         .join("; "),
     },
     body: `ctl00%24ScriptManager1=ctl00%24MasterUpdatePanel%7Cctl00%24MainContent%24RestaurantDropDownList&__EVENTTARGET=ctl00%24MainContent%24RestaurantDropDownList&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=${encodeURIComponent(
-      formParams.get("__VIEWSTATE") || ""
+      formParams.get("__VIEWSTATE") || "",
     )}&__VIEWSTATEGENERATOR=${formParams.get(
-      "__VIEWSTATEGENERATOR"
+      "__VIEWSTATEGENERATOR",
     )}&__SCROLLPOSITIONX=0&__SCROLLPOSITIONY=0&__VIEWSTATEENCRYPTED=&__EVENTVALIDATION=${encodeURIComponent(
-      formParams.get("__EVENTVALIDATION") || ""
+      formParams.get("__EVENTVALIDATION") || "",
     )}&ctl00%24MainContent%24LanguagesDropDownList=fi&ctl00%24MainContent%24RestaurantTypeDropDownList=&ctl00%24MainContent%24RestaurantDropDownList=${restaurantId}&__ASYNCPOST=true&`,
     method: "POST",
   });
@@ -263,7 +263,7 @@ async function getRestaurantPDFLinkDirect(url: string, restaurantId: string) {
   const str = await data.text();
   const commandStrip = str.split("\n")[0].split("|");
   const path = decodeURIComponent(
-    commandStrip.find((i) => i.includes("Restaurant.aspx")) || ""
+    commandStrip.find((i) => i.includes("Restaurant.aspx")) || "",
   );
 
   // Make URL to request, in order to get PDF Link :::DDD
@@ -352,10 +352,10 @@ export async function getMenuOptions(req: Request, res: Response) {
     let fullUrl = url.includes("aromiv2://");
     url = url.replace("aromiv2://", "https://");
     if (!url.match(urlRegex)) {
-      responseStatus(res, 400, false, { cause: "Invalid of malformed URL!" });
+      responseStatus(res, 400, false, { cause: "Invalid or malformed URL!" });
       return;
     }
-    if (url.endsWith("/")) url = url.substr(0, url.length - 1);
+    if (url.endsWith("/")) url = url.slice(0, -1);
     let hashKey = HashUtils.sha1Digest(url + "_aroma");
     let cache = await userCache.getItem(hashKey);
     if (cache) {
@@ -365,7 +365,7 @@ export async function getMenuOptions(req: Request, res: Response) {
       let restaurants: Restaurant[];
       try {
         restaurants = await getRestaurantListFromUrl(
-          url + (fullUrl ? "" : "/Default.aspx")
+          url + (fullUrl ? "" : "/Default.aspx"),
         );
       } catch (e) {
         console.log("Falling back to old method!", e);
@@ -377,7 +377,7 @@ export async function getMenuOptions(req: Request, res: Response) {
       // Set cache
       await userCache.setItem(hashKey, restaurants, { ttl: 3600 });
       responseStatus(res, 200, true, { restaurants });
-      if (process.env.SKIP_SELENIUM_QUIT != "false") {
+      if (process.env.SKIP_SELENIUM_QUIT == "false") {
         setTimeout(() => {
           try {
             driver?.close().catch(() => {});
@@ -464,16 +464,16 @@ export async function getRestaurantPage(req: Request, res: Response) {
   let fullUrl = url.includes("aromiv2://");
   url = url.replace("aromiv2://", "https://");
   if (!url.match(urlRegex)) {
-    responseStatus(res, 400, false, { cause: "Invalid of malformed URL!" });
+    responseStatus(res, 400, false, { cause: "Invalid or malformed URL!" });
     return;
   }
-  if (url.endsWith("/")) url = url.substr(0, url.length - 1);
+  if (url.endsWith("/")) url = url.slice(0, -1);
   const fetchDocument = async (
     pdfUrl: string,
-    driver: ThenableWebDriver | null
+    driver: ThenableWebDriver | null,
   ) => {
     const fetchDate = async (
-      date: string
+      date: string,
     ): Promise<{ days: Day[]; diets: Diet[] }> => {
       let rssFeedUrl = pdfUrl
         .replace("%dmd%", date)
@@ -537,7 +537,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
     } else {
       responseStatus(res, 200, true, { menu: days, diets: diets });
     }
-    if (driver != null && process.env.SKIP_SELENIUM_QUIT == "false") {
+    if (driver != null && process.env.SKIP_SELENIUM_QUIT != "false") {
       setTimeout(() => {
         try {
           driver.close().catch(() => {});
@@ -557,7 +557,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
       try {
         pdfUrl = await getRestaurantPDFLinkDirect(
           url + (fullUrl ? "" : "/Default.aspx"),
-          id
+          id,
         );
       } catch (e) {
         // From now on, selenium method is only kept as backup
@@ -569,7 +569,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
           pdfUrl = await getRestaurantPDFLink(driver);
         } catch (e) {
           // Close driver before quitting request process
-          if (process.env.SKIP_SELENIUM_QUIT == "false") {
+          if (process.env.SKIP_SELENIUM_QUIT != "false") {
             setTimeout(() => {
               try {
                 driver?.close().catch(() => {});

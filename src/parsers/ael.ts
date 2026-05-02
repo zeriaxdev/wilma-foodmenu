@@ -9,7 +9,7 @@ import * as parser from "./iss-web";
 const type = "ael";
 
 export function parse(
-  html: string
+  html: string,
 ): { menu: Day[]; diets: Diet[] } | undefined {
   return parser.parse(html, type);
 }

@@ -15,7 +15,7 @@ export class NeedleCaching {
   checkCache(
     url: string,
     callback: (value: any | undefined) => void,
-    error: (error: any) => void
+    error: (error: any) => void,
   ) {
     let urlHash = HashUtils.sha1Digest(url);
     this.userCache
@@ -32,7 +32,7 @@ export class NeedleCaching {
     url: string,
     response: any,
     callback: () => void,
-    error: (error: any) => void
+    error: (error: any) => void,
   ) {
     let urlHash = HashUtils.sha1Digest(url);
     this.userCache
