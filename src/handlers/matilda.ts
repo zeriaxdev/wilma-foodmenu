@@ -51,13 +51,11 @@ export async function getMenuData(
 }
 
 /**
- * Get Restaurant data with meals
- *
  * @swagger
  * /aroma/aromiv2://matilda/restaurants/{id}:
  *   get:
  *     summary: Get Matilda restaurant menu
- *     description: Retrieves the menu and meal data for a specific restaurant from the Matilda food platform
+ *     description: Retrieves the weekly menu for a specific Matilda platform restaurant
  *     tags: [Matilda]
  *     parameters:
  *       - in: path
@@ -65,69 +63,32 @@ export async function getMenuData(
  *         required: true
  *         schema:
  *           type: string
- *         description: Restaurant ID from Matilda
+ *         description: Restaurant ID from the Matilda restaurants list
  *     responses:
  *       200:
  *         description: Menu retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 menu:
- *                   type: array
- *                   items:
- *                     type: object
- *                     description: Menu data for each day
- *                 diets:
- *                   type: array
- *                   items:
- *                     type: object
- *                   example: []
+ *               $ref: '#/components/schemas/MenuResponse'
  *       400:
  *         description: Missing required parameters
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Required parameters not specified!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Restaurant not found
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Restaurant not found!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *
- * @param req
- * @param res
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getRestaurantPage(req: Request, res: Response) {
   try {
@@ -188,12 +149,12 @@ export async function getRestaurantPage(req: Request, res: Response) {
  * @swagger
  * /aroma/aromiv2://matilda/restaurants:
  *   get:
- *     summary: Get Matilda restaurants list
- *     description: Retrieves a list of all available restaurants/distributors from the Matilda food platform
+ *     summary: List Matilda restaurants
+ *     description: Retrieves all available restaurants/distributors from the Matilda food platform
  *     tags: [Matilda]
  *     responses:
  *       200:
- *         description: Restaurants list retrieved successfully
+ *         description: Restaurants retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -205,24 +166,13 @@ export async function getRestaurantPage(req: Request, res: Response) {
  *                 restaurants:
  *                   type: array
  *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       name:
- *                         type: string
+ *                     $ref: '#/components/schemas/Restaurant'
  *       500:
  *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getMenuOptions(req: Request, res: Response) {
   try {

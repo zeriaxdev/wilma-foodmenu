@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /tyk/menu:
  *   get:
  *     summary: Get TYK school menu
- *     description: Retrieves the menu for TYK (Tampereen yhteiskoulu) school cafeteria
+ *     description: Retrieves the weekly menu for Tampereen Yhteiskoulu (TYK)
  *     tags: [Schools]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleTyk(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

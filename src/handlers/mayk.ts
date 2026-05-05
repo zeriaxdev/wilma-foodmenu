@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /mayk/menu:
  *   get:
  *     summary: Get MAYK school menu
- *     description: Retrieves the menu for MAYK school cafeteria
+ *     description: Retrieves the weekly menu for Maunulan yhteiskoulu (MAYK)
  *     tags: [Schools]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleMayk(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

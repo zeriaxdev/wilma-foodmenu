@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /kastelli/menu:
  *   get:
  *     summary: Get Kastelli restaurant menu
- *     description: Retrieves the menu for Kastelli restaurant from ISS food services
+ *     description: Retrieves the menu for Kastelli restaurant via ISS food services
  *     tags: [Restaurants]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleKastelli(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {
