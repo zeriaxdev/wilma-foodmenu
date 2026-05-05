@@ -25,12 +25,12 @@ interface MenuProvider {
  * @swagger
  * /menus:
  *   get:
- *     summary: Get list of all available menu providers
- *     description: Returns a comprehensive list of all menu sources available in the API, including schools, restaurants, and food service providers with metadata like names, logos, and descriptions.
+ *     summary: List all menu providers
+ *     description: Returns all available menu sources with metadata (name, type, endpoint, location, supported features)
  *     tags: [Directory]
  *     responses:
  *       200:
- *         description: Menu providers list retrieved successfully
+ *         description: Providers retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -39,65 +39,10 @@ interface MenuProvider {
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     providers:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: string
- *                             description: Unique identifier for the provider
- *                           name:
- *                             type: string
- *                             description: Display name of the provider
- *                           type:
- *                             type: string
- *                             enum: [school, restaurant, daycare, food_service]
- *                             description: Type of menu provider
- *                           category:
- *                             type: string
- *                             description: Category description
- *                           description:
- *                             type: string
- *                             description: Detailed description
- *                           logo:
- *                             type: string
- *                             description: Logo URL (when available)
- *                           image:
- *                             type: string
- *                             description: Image/banner URL (when available)
- *                           endpoint:
- *                             type: string
- *                             description: API endpoint pattern
- *                           example:
- *                             type: string
- *                             description: Example API call
- *                           location:
- *                             type: string
- *                             description: Geographic location/area served
- *                           website:
- *                             type: string
- *                             description: Official website URL
- *                           supported_features:
- *                             type: array
- *                             items:
- *                               type: string
- *                             description: List of supported features
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *                 providers:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MenuProvider'
  */
 export function getMenuList(req: Request, res: Response) {
   const providers: MenuProvider[] = [

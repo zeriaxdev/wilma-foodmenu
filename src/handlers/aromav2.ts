@@ -289,8 +289,8 @@ async function getRestaurantPDFLinkDirect(url: string, restaurantId: string) {
  * @swagger
  * /aroma/{url}/restaurants:
  *   get:
- *     summary: Get Aromi restaurants list
- *     description: Retrieves a list of restaurants available from an Aromi food service system
+ *     summary: List Aromi restaurants
+ *     description: Retrieves all restaurants available from an Aromi food service instance. Use the aromiv2:// prefix or a full URL.
  *     tags: [Aromi]
  *     parameters:
  *       - in: path
@@ -298,11 +298,10 @@ async function getRestaurantPDFLinkDirect(url: string, restaurantId: string) {
  *         required: true
  *         schema:
  *           type: string
- *         description: Aromi service URL (can use aromiv2:// prefix)
- *         example: "aromiv2://example-service.com"
+ *         description: Aromi service URL (use aromiv2:// prefix or full URL)
  *     responses:
  *       200:
- *         description: Restaurants list retrieved successfully
+ *         description: Restaurants retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -311,36 +310,22 @@ async function getRestaurantPDFLinkDirect(url: string, restaurantId: string) {
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
+ *                 restaurants:
  *                   type: array
  *                   items:
- *                     type: object
- *                     description: Restaurant information
+ *                     $ref: '#/components/schemas/Restaurant'
  *       400:
- *         description: Missing URL parameter
+ *         description: Missing or invalid URL
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "URL not specified!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
- *         description: Server error or unable to retrieve restaurant list
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getMenuOptions(req: Request, res: Response) {
   try {
@@ -396,7 +381,7 @@ export async function getMenuOptions(req: Request, res: Response) {
  * /aroma/{url}/restaurants/{id}:
  *   get:
  *     summary: Get Aromi restaurant menu
- *     description: Retrieves the menu and meal data for a specific restaurant from an Aromi food service system
+ *     description: Retrieves the weekly menu for a specific Aromi restaurant
  *     tags: [Aromi]
  *     parameters:
  *       - in: path
@@ -404,53 +389,32 @@ export async function getMenuOptions(req: Request, res: Response) {
  *         required: true
  *         schema:
  *           type: string
- *         description: Aromi service URL (can use aromiv2:// prefix)
- *         example: "aromiv2://example-service.com"
+ *         description: Aromi service URL (use aromiv2:// prefix or full URL)
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: Restaurant ID
+ *         description: Restaurant ID from the restaurants list endpoint
  *     responses:
  *       200:
- *         description: Restaurant menu retrieved successfully
+ *         description: Menu retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Restaurant menu and meal data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       400:
- *         description: Missing required parameters
+ *         description: Missing or invalid parameters
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Required parameters not specified!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
- *         description: Server error or unable to retrieve menu data
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getRestaurantPage(req: Request, res: Response) {
   if (!req.params.url || !req.params.id) {

@@ -14,8 +14,8 @@ let httpClient = new Http();
  * @swagger
  * /krtpl/menu:
  *   get:
- *     summary: Get Tampere-Pirkkala Airport restaurant menu
- *     description: Retrieves the menu for the Kanresta restaurant at Tampere-Pirkkala Airport
+ *     summary: Get Tampere-Pirkkala Airport menu
+ *     description: Retrieves the menu for Tampere-Pirkkala Airport restaurant
  *     tags: [Restaurants]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleKrtpl(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

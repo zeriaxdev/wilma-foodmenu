@@ -108,8 +108,8 @@ interface CustomerRestaurant {
  * @swagger
  * /jamix/restaurants:
  *   get:
- *     summary: Get all Jamix restaurants
- *     description: Retrieves a list of all available restaurants/kitchens from Jamix food service
+ *     summary: List all Jamix restaurants
+ *     description: Retrieves all available restaurants/kitchens from Jamix food service
  *     tags: [Jamix]
  *     responses:
  *       200:
@@ -132,6 +132,7 @@ interface CustomerRestaurant {
  *                         properties:
  *                           customerId:
  *                             type: string
+ *                             example: "96773"
  *                           kitchens:
  *                             type: array
  *                             items:
@@ -139,19 +140,25 @@ interface CustomerRestaurant {
  *                               properties:
  *                                 kitchenName:
  *                                   type: string
+ *                                   example: "OMNIA Timantti (Leppävaara)"
  *                                 kitchenId:
  *                                   type: number
+ *                                   example: 12
  *                                 address:
  *                                   type: string
  *                                 city:
  *                                   type: string
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  * /jamix/{query}/restaurants:
  *   get:
  *     summary: Search Jamix restaurants
- *     description: Searches for restaurants/kitchens by name, address, or city. The full restaurant list is fetched from Jamix and filtered by the query string.
+ *     description: Filters restaurants/kitchens by name, address, or city (case-insensitive)
  *     tags: [Jamix]
  *     parameters:
  *       - in: path
@@ -159,7 +166,7 @@ interface CustomerRestaurant {
  *         required: true
  *         schema:
  *           type: string
- *         description: Search query for filtering restaurants by kitchen name, address, or city (case-insensitive)
+ *         description: Search query to filter by kitchen name, address, or city
  *     responses:
  *       200:
  *         description: Restaurants retrieved successfully
@@ -196,6 +203,10 @@ interface CustomerRestaurant {
  *                                   type: string
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getMenuOptions(req: Request, res: Response) {
   try {
@@ -285,8 +296,8 @@ function filterRestaurants(
  * @swagger
  * /jamix/menu/{customerId}/{kitchenId}:
  *   get:
- *     summary: Get restaurant menu
- *     description: Retrieves the menu for a specific Jamix restaurant/kitchen. Supports date filtering for specific days or date ranges.
+ *     summary: Get Jamix restaurant menu
+ *     description: Retrieves the menu for a specific Jamix kitchen. Supports date filtering and language selection. Includes nutrition info (portion size, dietary codes, allergens) per meal.
  *     tags: [Jamix]
  *     parameters:
  *       - in: path
@@ -294,33 +305,34 @@ function filterRestaurants(
  *         required: true
  *         schema:
  *           type: string
- *         description: Customer ID of the restaurant
+ *         description: Customer ID
+ *         example: "96773"
  *       - in: path
  *         name: kitchenId
  *         required: true
  *         schema:
  *           type: string
- *         description: Kitchen ID of the restaurant
+ *         description: Kitchen ID
+ *         example: "12"
  *       - in: query
  *         name: date
  *         schema:
  *           type: string
- *         description: Start date in YYYYMMDD format (e.g., 20241225). If not provided, returns current menu.
- *         example: "20241225"
+ *         description: Start date (YYYYMMDD). Defaults to current week if omitted.
+ *         example: "20260505"
  *       - in: query
  *         name: date2
  *         schema:
  *           type: string
- *         description: End date in YYYYMMDD format (e.g., 20241231). Use with date for date range.
- *         example: "20241231"
+ *         description: End date (YYYYMMDD). Use with date for a range.
+ *         example: "20260509"
  *       - in: query
  *         name: lang
  *         schema:
  *           type: string
  *           enum: [fi, en]
- *         description: Language for menu data (fi = Finnish, en = English)
- *         default: fi
- *         example: "fi"
+ *           default: fi
+ *         description: Language (fi = Finnish, en = English)
  *     responses:
  *       200:
  *         description: Menu retrieved successfully
@@ -337,69 +349,24 @@ function filterRestaurants(
  *                   properties:
  *                     menu:
  *                       type: array
- *                       description: Array of Day objects, each containing menus for that day
  *                       items:
- *                         type: object
- *                         properties:
- *                           date:
- *                             type: string
- *                             example: "2024-12-25"
- *                           menus:
- *                             type: array
- *                             items:
- *                               type: object
- *                               properties:
- *                                 name:
- *                                   type: string
- *                                   example: "Lounas pääruoat"
- *                                 meals:
- *                                   type: array
- *                                   items:
- *                                     type: object
- *                                     properties:
- *                                       id:
- *                                         type: string
- *                                       name:
- *                                         type: string
- *                                       ingredients:
- *                                         type: string
+ *                         $ref: '#/components/schemas/Day'
  *                     diets:
  *                       type: array
- *                       description: Array of unique diet codes found in the menu
  *                       items:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                             example: "G"
- *                           description:
- *                             type: string
- *                             example: "G"
+ *                         $ref: '#/components/schemas/Diet'
  *       400:
  *         description: Missing required parameters
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Customer ID and Kitchen ID not specified!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
- *         description: Server error or unable to retrieve menu
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export async function getRestaurantPage(req: Request, res: Response) {
   try {

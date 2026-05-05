@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /mantsala/menu:
  *   get:
  *     summary: Get Mantsala school menu
- *     description: Retrieves the menu for Mantsala school from ISS food services
+ *     description: Retrieves the weekly menu for Mäntsälä schools via ISS food services
  *     tags: [Schools]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleMantsala(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

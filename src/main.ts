@@ -55,7 +55,12 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ["./src/handlers/*.ts", "./build/handlers/*.js"], // Path to the API docs
+  apis: [
+    "./src/swagger-schemas.ts",
+    "./src/handlers/*.ts",
+    "./build/swagger-schemas.js",
+    "./build/handlers/*.js",
+  ],
 };
 
 const swaggerSpecs = swaggerJsdoc(swaggerOptions);

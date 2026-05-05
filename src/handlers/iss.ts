@@ -36,8 +36,8 @@ export function getISSMenus() {
  * @swagger
  * /iss/menus:
  *   get:
- *     summary: Get list of ISS restaurants
- *     description: Retrieves a list of all ISS restaurants available for menu data
+ *     summary: List ISS restaurants
+ *     description: Retrieves all ISS restaurants available for menu retrieval
  *     tags: [ISS]
  *     responses:
  *       200:
@@ -50,26 +50,16 @@ export function getISSMenus() {
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     menus:
- *                       type: array
- *                       items:
- *                         type: object
- *                         description: Restaurant information
+ *                 menus:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ISSRestaurant'
  *       500:
  *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleISSMenuList(req: Request, res: Response) {
   getISSMenus()
@@ -86,7 +76,7 @@ export function handleISSMenuList(req: Request, res: Response) {
  * /iss/menu/{url}:
  *   get:
  *     summary: Get ISS restaurant menu
- *     description: Retrieves the menu for a specific ISS restaurant using its URL
+ *     description: Retrieves the menu for a specific ISS restaurant. Use the iss:// prefix (converted to https://) or a full URL. Must point to an iss.fi domain.
  *     tags: [ISS]
  *     parameters:
  *       - in: path
@@ -94,47 +84,26 @@ export function handleISSMenuList(req: Request, res: Response) {
  *         required: true
  *         schema:
  *           type: string
- *         description: Restaurant URL (can use iss:// prefix which gets converted to https://)
- *         example: "iss://example-restaurant.com"
+ *         description: Restaurant URL (use iss:// prefix or full https:// URL pointing to iss.fi)
  *     responses:
  *       200:
  *         description: Menu retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data for the restaurant
+ *               $ref: '#/components/schemas/MenuResponse'
  *       400:
- *         description: Missing URL parameter
+ *         description: Missing or invalid URL
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "URL not specified!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
- *         description: Server error or unable to retrieve/parse menu
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleISSMenu(req: Request, res: Response) {
   if (!req.params.url) {

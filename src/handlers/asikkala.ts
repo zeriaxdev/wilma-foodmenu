@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /asikkala/menu:
  *   get:
  *     summary: Get Asikkala school menu
- *     description: Retrieves the menu for Asikkala municipality schools
+ *     description: Retrieves the weekly menu for Asikkala municipality schools
  *     tags: [Schools]
  *     responses:
  *       200:
@@ -23,37 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     menu:
- *                       type: array
- *                       items:
- *                         type: object
- *                         description: Menu data for each day
- *                     diets:
- *                       type: array
- *                       items:
- *                         type: object
- *                       example: []
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleAsikkala(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

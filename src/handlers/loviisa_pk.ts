@@ -23,37 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     menu:
- *                       type: array
- *                       items:
- *                         type: object
- *                         description: Menu data for each day
- *                     diets:
- *                       type: array
- *                       items:
- *                         type: object
- *                       example: []
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
- *         description: Server error or unable to parse menu/PDF
+ *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handleLoviisaPk(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

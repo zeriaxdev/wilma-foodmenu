@@ -15,7 +15,7 @@ let httpClient = new Http();
  * /pyhtaa/menu:
  *   get:
  *     summary: Get Pyhtää school menu
- *     description: Retrieves the menu for Pyhtää municipality schools
+ *     description: Retrieves the weekly menu for Pyhtää municipality schools
  *     tags: [Schools]
  *     responses:
  *       200:
@@ -23,27 +23,13 @@ let httpClient = new Http();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Parsed menu data
+ *               $ref: '#/components/schemas/MenuResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 export function handlePyhtaa(req: Request, res: Response) {
   httpClient.get(url, (error, response) => {

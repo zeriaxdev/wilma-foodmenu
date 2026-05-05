@@ -18,7 +18,7 @@ let httpClient = new Http();
  * /looki/{endpoint}/menu:
  *   get:
  *     summary: Get Looki restaurant menu
- *     description: Retrieves menu data from Looki food service system for a specific restaurant endpoint
+ *     description: Retrieves menu from a Looki food service restaurant
  *     tags: [Restaurants]
  *     parameters:
  *       - in: path
@@ -27,57 +27,25 @@ let httpClient = new Http();
  *         schema:
  *           type: string
  *         description: Looki restaurant endpoint identifier
- *         example: "restaurant-name"
  *     responses:
  *       200:
  *         description: Menu retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     menu:
- *                       type: array
- *                       items:
- *                         type: object
- *                         description: Menu data for each day
- *                     diets:
- *                       type: array
- *                       items:
- *                         type: object
- *                         description: Diet information
+ *               $ref: '#/components/schemas/MenuResponse'
  *       400:
  *         description: Missing endpoint parameter
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Menu endpoint is missing!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error or unable to parse menu
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: boolean
- *                   example: false
- *                 cause:
- *                   type: string
- *                   example: "Unable to parse menu!"
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 function fetchAndParse(url: string): Promise<any> {
   return new Promise<any>((resolve, reject) => {
