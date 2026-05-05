@@ -6,7 +6,7 @@ import { Request, Response } from "express";
 import { responseStatus, errorResponse } from "../utils/response_utilities";
 import { Day } from "../models/Day";
 import { Menu } from "../models/Menu";
-import { Meal } from "../models/Meal";
+import { Meal, NutritionInfo } from "../models/Meal";
 import { Diet } from "../models/Diet";
 import { HashUtils } from "../crypto/hash";
 import { CacheContainer } from "node-ts-cache";
@@ -472,6 +472,22 @@ function stripHtml(str: string): string {
 }
 
 /**
+ * Extract allergens from <strong>(allergen1, allergen2)</strong> patterns in ingredients.
+ */
+function extractAllergens(ingredients: string): string[] {
+  const allergens: Set<string> = new Set();
+  const regex = /<strong>\(([^)]+)\)<\/strong>/g;
+  let match;
+  while ((match = regex.exec(ingredients)) !== null) {
+    for (const allergen of match[1].split(",")) {
+      const trimmed = allergen.trim().toLowerCase();
+      if (trimmed) allergens.add(trimmed);
+    }
+  }
+  return Array.from(allergens);
+}
+
+/**
  * Parse a Jamix menu API response into Day[] and Diet[] models.
  */
 function parseMenuData(kitchen: JamixMenuResponse): {
@@ -498,13 +514,39 @@ function parseMenuData(kitchen: JamixMenuResponse): {
 
           for (const menuItem of mealOption.menuItems) {
             const mealId = `${mealOption.id}_${menuItem.orderNumber}`;
-            const ingredients = menuItem.ingredients
-              ? stripHtml(menuItem.ingredients)
+            const rawIngredients = menuItem.ingredients || "";
+            const ingredients = rawIngredients
+              ? stripHtml(rawIngredients)
               : undefined;
 
+            const nutrition: NutritionInfo = {};
+            if (menuItem.portionSize) {
+              nutrition.portionSize = menuItem.portionSize;
+            }
+            if (menuItem.diets && menuItem.diets.trim()) {
+              nutrition.diets = menuItem.diets
+                .split(",")
+                .map((d) => d.trim())
+                .filter(Boolean);
+            }
+            if (rawIngredients) {
+              const allergens = extractAllergens(rawIngredients);
+              if (allergens.length > 0) {
+                nutrition.allergens = allergens;
+              }
+            }
+
+            const hasNutrition = Object.keys(nutrition).length > 0;
             mealOptionsMap
               .get(mealOption.name)!
-              .push(new Meal(mealId, menuItem.name, ingredients));
+              .push(
+                new Meal(
+                  mealId,
+                  menuItem.name,
+                  ingredients,
+                  hasNutrition ? nutrition : undefined,
+                ),
+              );
 
             // Collect unique diet codes
             if (menuItem.diets && menuItem.diets.trim()) {

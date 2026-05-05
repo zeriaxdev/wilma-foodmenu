@@ -2,13 +2,9 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "rootDir": "./src",
-    "outDir": "./build",
     "esModuleInterop": true,
     "strict": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "skipLibCheck": true
   },
-  "exclude": ["test"]
+  "include": ["./**/*"]
 }
