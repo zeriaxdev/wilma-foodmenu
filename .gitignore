@@ -26,3 +26,5 @@ pyvenv.cfg
 .wplus_data/
 *-firebase-adminsdk-*.json
 testconfig.json
+.claude/
+CLAUDE.md
