@@ -17,6 +17,8 @@ Many Finnish schools, daycares, and restaurants publish their food menus in form
 
 Supported providers include Jamix, Aromi, ISS, Matilda, and various individual school/restaurant websites.
 
+Originally forked from [wilmaplus/foodmenu](https://github.com/wilmaplus/foodmenu).
+
 ## Install
 
 Requires Node.js 16+.
