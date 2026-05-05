@@ -25,14 +25,14 @@ export function parse(
   }
   let items: Day[] = [];
   let cards = document.querySelectorAll('div[class="lunch-menu__day"]');
-  if (cards !== undefined) {
+  if (cards != null) {
     for (let card of cards) {
       let pElem = card.querySelectorAll("p");
       let dateElem = card.querySelector("h2");
 
       let date: any = null;
-      let regexResult = dateRegex.exec(dateElem.text);
-      if (regexResult != null && regexResult[0] !== undefined) {
+      let regexResult = dateElem ? dateRegex.exec(dateElem.text) : null;
+      if (regexResult != null && regexResult[0] != null) {
         let momentDate = moment(regexResult[0], "DD.MM").startOf("day");
         date = momentDate.format();
       }
@@ -51,10 +51,10 @@ export function parse(
     }
     // Get nutrition details
     let nutritionDiv = document.querySelector('div[class="nutrition-details"]');
-    let nutritionText = nutritionDiv.querySelector("p");
+    let nutritionText = nutritionDiv?.querySelector("p") ?? null;
 
     let diets: Diet[] = [];
-    for (let item of nutritionText.text.split(",")) {
+    for (let item of (nutritionText?.text ?? "").split(",")) {
       let split = item.split("=");
       let code = split[0].trim();
       let name = split[1].trim();

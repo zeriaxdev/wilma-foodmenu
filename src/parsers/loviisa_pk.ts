@@ -19,8 +19,8 @@ const type = "loviisa_pk";
 export function parsePDFLink(html: string): string | undefined {
   let document = parser.parse(html);
   let urlBox = document.querySelector("section[class='widget sidebar-lift']");
-  let links = urlBox.querySelector("a");
-  return links.getAttribute("href");
+  let links = urlBox?.querySelector("a") ?? null;
+  return links?.getAttribute("href");
 }
 
 export async function parse(

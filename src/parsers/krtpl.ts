@@ -41,20 +41,20 @@ export function parse(
   let weeks = document.querySelectorAll(".lunch-container");
   weeks.forEach((weekBox) => {
     let weekNum =
-      weekBox.querySelector(".lunch-current-week-num").text.trim() || undefined;
+      weekBox.querySelector(".lunch-current-week-num")?.text.trim() || undefined;
     let dietsHtml = weekBox.querySelector(".shortcuts");
     // Parse diets
-    if (diets.length < 1 && dietsHtml !== undefined) {
+    if (diets.length < 1 && dietsHtml != null) {
       let splittedDiets = dietsHtml.text.trim().split(", ");
       splittedDiets.forEach((splittedDiet) => {
         let dietParts = splittedDiet.split(" = ");
         diets.push(new Diet(dietParts[0], dietParts[1]));
       });
     }
-    if (weekNum !== undefined) {
+    if (weekNum != null) {
       let foodBox = weekBox.querySelectorAll(".col-md-12");
       foodBox.forEach((food) => {
-        if (weekNum !== undefined) {
+        if (weekNum != null) {
           let timestamp = moment()
             .week(parseInt(weekNum) + 1)
             .day(convertDayName(food.classNames[food.classNames.length - 1]))

@@ -333,7 +333,7 @@ export async function getMenuOptions(req: Request, res: Response) {
       responseStatus(res, 400, false, { cause: "URL not specified!" });
       return;
     }
-    let url = req.params.url;
+    let url = req.params.url as string;
     let fullUrl = url.includes("aromiv2://");
     url = url.replace("aromiv2://", "https://");
     if (!url.match(urlRegex)) {
@@ -423,8 +423,8 @@ export async function getRestaurantPage(req: Request, res: Response) {
     });
     return;
   }
-  let url = req.params.url;
-  let id = req.params.id;
+  let url = req.params.url as string;
+  let id = req.params.id as string;
   let fullUrl = url.includes("aromiv2://");
   url = url.replace("aromiv2://", "https://");
   if (!url.match(urlRegex)) {

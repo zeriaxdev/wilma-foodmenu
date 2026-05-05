@@ -10,7 +10,7 @@ const type = "aromiv2";
 export async function extractNextJSBuildId(html: string): Promise<string> {
   let document = parser.parse(html);
   let json = JSON.parse(
-    document.querySelector("script#__NEXT_DATA__").innerText
+    document.querySelector("script#__NEXT_DATA__")!.innerText
   );
   return json.buildId;
 }

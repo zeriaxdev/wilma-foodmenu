@@ -210,7 +210,7 @@ interface CustomerRestaurant {
  */
 export async function getMenuOptions(req: Request, res: Response) {
   try {
-    const query = (req.params.query || "").trim().toLowerCase();
+    const query = (req.params.query as string || "").trim().toLowerCase();
     const hashKey = HashUtils.sha1Digest(`jamix_restaurants_${query || "all"}`);
     const cached = await userCache.getItem<CustomerRestaurant[]>(hashKey);
 
@@ -377,8 +377,8 @@ export async function getRestaurantPage(req: Request, res: Response) {
       return;
     }
 
-    const customerId = req.params.customerId;
-    const kitchenId = req.params.kitchenId;
+    const customerId = req.params.customerId as string;
+    const kitchenId = req.params.kitchenId as string;
     const lang = (req.query.lang as string) || "fi";
     const date = req.query.date as string | undefined;
     const date2 = req.query.date2 as string | undefined;

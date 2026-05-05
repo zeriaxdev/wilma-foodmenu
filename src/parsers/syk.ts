@@ -16,7 +16,7 @@ const type = "syk";
 export function parse(html: string): Day[] | undefined {
   let document = parser.parse(html);
   let card = document.querySelector("div[class='secondary-bg-border']");
-  if (card !== undefined) {
+  if (card != null) {
     let items: Day[] = [];
     let pElem = card.querySelectorAll("*");
     let begin = false;

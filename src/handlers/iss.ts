@@ -110,7 +110,7 @@ export function handleISSMenu(req: Request, res: Response) {
     responseStatus(res, 400, false, { cause: "URL not specified!" });
     return;
   }
-  let url = req.params.url;
+  let url = req.params.url as string;
   url = url.replace("iss://", "https://");
   if (!url.match(urlRegex)) {
     responseStatus(res, 400, false, { cause: "Invalid or malformed URL!" });

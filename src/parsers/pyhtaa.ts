@@ -20,11 +20,11 @@ export function parse(
   let document = parser.parse(html);
   let items: Day[] = [];
   let card = document.querySelector('div[class="content"]');
-  if (card !== undefined) {
+  if (card != null) {
     let pElem = card.querySelectorAll("p");
     pElem.forEach((item) => {
       let regexResult = dateRegex.exec(item.text);
-      if (regexResult != null && regexResult[0] !== undefined) {
+      if (regexResult != null && regexResult[0] != null) {
         let momentDate = moment(regexResult[0], "DD.MM").startOf("day");
         let date: any = momentDate.format();
         let meals: Meal[] = [];

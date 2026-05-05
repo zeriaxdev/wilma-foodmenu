@@ -98,7 +98,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
       });
       return;
     }
-    let id = req.params.id;
+    let id = req.params.id as string;
     let cache = await userCache.getItem(id);
     if (cache) {
       return responseStatus(res, 200, true, { menu: cache, diets: [] });

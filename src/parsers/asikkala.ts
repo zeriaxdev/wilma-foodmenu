@@ -17,7 +17,7 @@ const type = "asikkala";
 export function parse(html: string): Day[] | undefined {
   let document = parser.parse(html);
   let article = document.querySelector("article");
-  if (article !== undefined) {
+  if (article != null) {
     let items: Day[] = [];
     let pElem = article.querySelectorAll("p");
     let begin = false;
@@ -28,7 +28,7 @@ export function parse(html: string): Day[] | undefined {
       if (!begin) {
         item.childNodes.forEach((node) => {
           let regexResult = dateRegex.exec(node.text);
-          if (regexResult != null && regexResult[0] !== undefined) {
+          if (regexResult != null && regexResult[0] != null) {
             let item = regexResult[0];
             date = moment(item, "DD.MM.YYYY").startOf("day").format();
             begin = true;
@@ -36,7 +36,7 @@ export function parse(html: string): Day[] | undefined {
           }
         });
         if (begin) {
-          menuName = item.lastChild.text.trim();
+          menuName = item.lastChild?.text.trim() ?? "";
         }
       } else {
         if (item.text !== whitespace) {

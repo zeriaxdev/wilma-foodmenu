@@ -64,7 +64,7 @@ export function handleLookiKbp(req: Request, res: Response) {
     errorResponse(res, 400, "Menu endpoint is missing!");
     return;
   }
-  const endpoint = req.params.endpoint;
+  const endpoint = req.params.endpoint as string;
   if (
     endpoint.includes("..") ||
     endpoint.includes("/") ||
