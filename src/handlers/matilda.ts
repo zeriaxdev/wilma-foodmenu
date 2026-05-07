@@ -6,7 +6,6 @@ import { CacheContainer } from "node-ts-cache";
 import { MemoryStorage } from "node-ts-cache-storage-memory";
 import { extractNextJSBuildId, parseMatildaModel } from "../parsers/matilda";
 import { randomUUID } from "crypto";
-import fetch from "node-fetch";
 import { Restaurant } from "../models/Restaurant";
 
 import { Day } from "../models/Day";

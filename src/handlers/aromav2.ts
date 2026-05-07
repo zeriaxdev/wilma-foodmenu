@@ -29,7 +29,6 @@ import { Diet } from "../models/Diet";
 import { Options } from "selenium-webdriver/chrome";
 import moment from "moment";
 import { Day } from "../models/Day";
-import fetch from "node-fetch";
 import { Cookies } from "needle";
 
 const urlRegex =

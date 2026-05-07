@@ -36,7 +36,7 @@ npm run production
 The server will start on `http://localhost:3000` by default.
 
 ### Accessing Documentation
-- **Swagger UI**: Visit `http://localhost:3000/api-docs` for interactive API documentation
+- **Swagger UI**: Visit `http://localhost:3000/docs` for interactive API documentation
 - **API Testing**: Use the built-in Swagger interface to test endpoints
 
 ## API Endpoints
@@ -645,7 +645,7 @@ Some endpoints implement caching to reduce load on source websites:
 ### Getting Help
 - Check the [GitHub Issues](https://github.com/wilmaplus/foodmenu/issues) for known problems
 - Review the [Wiki](https://github.com/wilmaplus/foodmenu/wiki) for additional documentation
-- Test endpoints using the Swagger UI at `/api-docs`
+- Test endpoints using the Swagger UI at `/docs`
 
 ## Contributing
 

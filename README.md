@@ -57,7 +57,7 @@ Start in production mode:
 npm start
 ```
 
-The server runs on port 3000 by default. Interactive API documentation is available at `/api-docs`.
+The server runs on port 3000 by default. Interactive API documentation is available at `/docs`.
 
 ## API
 

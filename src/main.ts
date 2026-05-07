@@ -80,13 +80,13 @@ app.use((req, res, next) => {
 });
 
 // Serve raw OpenAPI spec
-app.get("/api-docs/openapi.json", (req, res) => {
+app.get("/docs/openapi.json", (req, res) => {
   res.json(swaggerSpecs);
 });
 
 // Scalar API Reference
 app.use(
-  "/api-docs",
+  "/docs",
   apiReference({
     spec: {
       content: swaggerSpecs,
@@ -154,7 +154,7 @@ app.get("/menus", menuList.getMenuList);
  *                   example: "1.2.2"
  *                 docs:
  *                   type: string
- *                   example: /api-docs
+ *                   example: /docs
  *                 endpoints:
  *                   type: object
  *                   properties:
@@ -163,21 +163,21 @@ app.get("/menus", menuList.getMenuList);
  *                       example: /menus
  *                     docs:
  *                       type: string
- *                       example: /api-docs
+ *                       example: /docs
  *                     openapi:
  *                       type: string
- *                       example: /api-docs/openapi.json
+ *                       example: /docs/openapi.json
  */
 app.get("/", (req, res) => {
   res.json({
     status: true,
     name: "Food Menu API",
     version: pkg.version,
-    docs: "/api-docs",
+    docs: "/docs",
     endpoints: {
       menus: "/menus",
-      docs: "/api-docs",
-      openapi: "/api-docs/openapi.json",
+      docs: "/docs",
+      openapi: "/docs/openapi.json",
     },
   });
 });
@@ -188,5 +188,5 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   logger.info({ port: PORT }, "Server listening");
-  logger.info({ url: `http://localhost:${PORT}/api-docs` }, "API docs available");
+  logger.info({ url: `http://localhost:${PORT}/docs` }, "API docs available");
 });
