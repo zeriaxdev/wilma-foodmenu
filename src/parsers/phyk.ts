@@ -36,7 +36,7 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
                     let mealText = meal.textContent;
                     if (mealText) {
                         mealText = mealText.trim();
-                        meals.push(new Meal(mealText, HashUtils.sha1Digest(type+'_'+mealText)));
+                        meals.push(new Meal(HashUtils.sha1Digest(type+'_'+mealText), mealText));
                     }
                 });
                 items.push(new Day(currentDayDate.toISOString(true), [new Menu('Lounas', meals)]));

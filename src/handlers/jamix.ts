@@ -553,12 +553,18 @@ function parseMenuData(kitchen: JamixMenuResponse): {
 }
 
 /**
- * Format a YYYYMMDD number into YYYY-MM-DD string
+ * Format a YYYYMMDD number into ISO 8601 date string with timezone,
+ * consistent with other parsers (e.g. "2026-05-04T00:00:00.000+03:00")
  */
 function formatDate(dateNum: number): string {
   const s = dateNum.toString();
   if (s.length !== 8) {
-    return moment(dateNum).format("YYYY-MM-DD");
+    return moment(dateNum).startOf("day").format();
   }
-  return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  return moment(
+    `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`,
+    "YYYY-MM-DD",
+  )
+    .startOf("day")
+    .format();
 }
