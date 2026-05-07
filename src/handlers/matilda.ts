@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { responseStatus } from "../utils/response_utilities";
+import logger from "../utils/logger";
 import { Http } from "../net/http";
 import { CacheContainer } from "node-ts-cache";
 import { MemoryStorage } from "node-ts-cache-storage-memory";
@@ -128,7 +129,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
         days = [...days, ...(await parseMatildaModel(json?.pageProps?.meals))];
       }
     } catch (e) {
-      console.log(e);
+      logger.warn({ err: e }, "Failed to fetch next week menu");
     }
 
     await userCache.setItem(id, days, { ttl: 3600 });
@@ -136,7 +137,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
     responseStatus(res, 200, true, { menu: days, diets: [] });
   } catch (error: any) {
     let uuid = randomUUID();
-    console.log(error, "getRestaurantPage", uuid);
+    logger.error({ err: error, requestId: uuid }, "getRestaurantPage failed");
     responseStatus(res, 500, false, {
       cause: "Unexpected error occurred, id: " + uuid,
     });
@@ -187,7 +188,7 @@ export async function getMenuOptions(req: Request, res: Response) {
     responseStatus(res, 200, true, { restaurants });
   } catch (error: any) {
     let uuid = randomUUID();
-    console.log(error, "getMenuOptions", uuid);
+    logger.error({ err: error, requestId: uuid }, "getMenuOptions failed");
     responseStatus(res, 500, false, {
       cause: "Unexpected error occurred, id: " + uuid,
     });

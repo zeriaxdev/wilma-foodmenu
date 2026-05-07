@@ -6,8 +6,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import swaggerJsdoc from "swagger-jsdoc";
 import { apiReference } from "@scalar/express-api-reference";
-import { readFileSync } from "fs";
-import { join } from "path";
+import logger from "./utils/logger";
 
 const pkg = JSON.parse(
   readFileSync(join(__dirname, "..", "package.json"), "utf-8"),
@@ -37,8 +36,6 @@ const jamix = require("./handlers/jamix");
 const menuList = require("./handlers/menu_list");
 
 (global as any).seleniumArgs = SELENIUM_ARGS;
-// Setting logs to include timestamp
-require("console-stamp")(console, "HH:MM:ss.l");
 
 // Swagger configuration
 const swaggerOptions = {
@@ -188,8 +185,6 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Listening to port " + PORT);
-  console.log(
-    `API documentation available at http://localhost:${PORT}/api-docs`,
-  );
+  logger.info({ port: PORT }, "Server listening");
+  logger.info({ url: `http://localhost:${PORT}/api-docs` }, "API docs available");
 });
