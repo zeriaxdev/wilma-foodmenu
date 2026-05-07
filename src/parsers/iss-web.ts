@@ -64,9 +64,8 @@ export function parse(
     let diets: Diet[] = [];
     for (let item of (nutritionText?.text ?? "").split(",")) {
       let split = item.split("=");
-      let code = split[0].trim();
-      let name = split[1].trim();
-      diets.push(new Diet(code, name));
+      if (split.length < 2 || !split[0]?.trim() || !split[1]?.trim()) continue;
+      diets.push(new Diet(split[0].trim(), split[1].trim()));
     }
     return { menu: items, diets: diets };
   }

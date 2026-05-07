@@ -94,36 +94,36 @@ app.use(
   }),
 );
 
-app.use("/asikkala/menu", asikkala);
-app.use("/syk/menu", syk);
-app.use("/steiner/menu", steiner);
-app.use("/pyhtaa/menu", pyhtaa);
-app.use("/krtpl/menu", krtpl);
-app.use("/tyk/menu", tyk);
-app.use("/mayk/menu", mayk);
-app.use("/phyk/menu", phyk);
-app.use("/poytyaps/menu", poytyaps);
-app.use("/kauhajoki/menu", kauhajoki);
-app.use("/looki/:endpoint/menu", lookiKbp);
-app.use("/kastelli/menu", kastelli);
-app.use("/ael/menu", ael);
-app.use("/mantsala/menu", mantsala);
-app.use("/iss/menus", issMenuList);
-app.use("/iss/menu/:url", issMenu);
-app.use("/aroma/:url/restaurants/:id", (req, res) =>
+app.get("/asikkala/menu", asikkala);
+app.get("/syk/menu", syk);
+app.get("/steiner/menu", steiner);
+app.get("/pyhtaa/menu", pyhtaa);
+app.get("/krtpl/menu", krtpl);
+app.get("/tyk/menu", tyk);
+app.get("/mayk/menu", mayk);
+app.get("/phyk/menu", phyk);
+app.get("/poytyaps/menu", poytyaps);
+app.get("/kauhajoki/menu", kauhajoki);
+app.get("/looki/:endpoint/menu", lookiKbp);
+app.get("/kastelli/menu", kastelli);
+app.get("/ael/menu", ael);
+app.get("/mantsala/menu", mantsala);
+app.get("/iss/menus", issMenuList);
+app.get("/iss/menu/:url", issMenu);
+app.get("/aroma/:url/restaurants/:id", (req, res) =>
   req?.params?.url == "aromiv2://matilda"
     ? matilda.getRestaurantPage(req, res)
     : aromaV2.getRestaurantPage(req, res),
 );
-app.use("/aroma/:url/restaurants", (req, res) =>
+app.get("/aroma/:url/restaurants", (req, res) =>
   req?.params?.url == "aromiv2://matilda"
     ? matilda.getMenuOptions(req, res)
     : aromaV2.getMenuOptions(req, res),
 );
-app.use("/loviisa/paivakoti/menu", loviisa.handleLoviisaPk);
-app.use("/jamix/restaurants", jamix.getMenuOptions);
-app.use("/jamix/:query/restaurants", jamix.getMenuOptions);
-app.use("/jamix/menu/:customerId/:kitchenId", jamix.getRestaurantPage);
+app.get("/loviisa/paivakoti/menu", loviisa.handleLoviisaPk);
+app.get("/jamix/restaurants", jamix.getMenuOptions);
+app.get("/jamix/:query/restaurants", jamix.getMenuOptions);
+app.get("/jamix/menu/:customerId/:kitchenId", jamix.getRestaurantPage);
 
 // Menu directory/list endpoint
 app.get("/menus", menuList.getMenuList);
