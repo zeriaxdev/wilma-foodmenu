@@ -43,7 +43,7 @@ test/         — TypeScript endpoint test runner
 ```sh
 npm run build    # compile
 npm run dev      # compile + start with --inspect
-npm run test     # smoke test all endpoints against http://localhost:3001
+npm run test     # smoke test all endpoints against http://localhost:3000
 npm run test:jamix    # test only Jamix endpoints
 npm run test:schools  # test only school endpoints
 ```
