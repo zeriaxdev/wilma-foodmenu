@@ -7,6 +7,7 @@ import { Http } from "../net/http";
 import { parseList, parse } from "../parsers/iss-web";
 import { Request, Response } from "express";
 import { errorResponse, responseStatus } from "../utils/response_utilities";
+import logger from "../utils/logger";
 import { HashUtils } from "../crypto/hash";
 import { CacheContainer } from "node-ts-cache";
 import { MemoryStorage } from "node-ts-cache-storage-memory";
@@ -67,6 +68,7 @@ export function handleISSMenuList(req: Request, res: Response) {
       responseStatus(res, 200, true, { menus: result });
     })
     .catch((err) => {
+      logger.error({ err }, "Failed to fetch ISS restaurant list");
       errorResponse(res, 500, err.toString());
     });
 }
@@ -136,7 +138,7 @@ export function handleISSMenu(req: Request, res: Response) {
       else {
         httpClient.get(url, (err, resp) => {
           if (err || resp == undefined) {
-            errorResponse(res, 500, err?.toString());
+            logger.error({ err, url }, "ISS menu fetch failed");
             return;
           }
           let parsedMenu = parse(resp.body, menuKeyHash);

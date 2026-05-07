@@ -4,6 +4,7 @@
 
 import { Request, Response } from "express";
 import { responseStatus, errorResponse } from "../utils/response_utilities";
+import logger from "../utils/logger";
 import { Day } from "../models/Day";
 import { Menu } from "../models/Menu";
 import { Meal, NutritionInfo } from "../models/Meal";
@@ -11,7 +12,6 @@ import { Diet } from "../models/Diet";
 import { HashUtils } from "../crypto/hash";
 import { CacheContainer } from "node-ts-cache";
 import { MemoryStorage } from "node-ts-cache-storage-memory";
-import fetch from "node-fetch";
 import moment from "moment";
 
 const searchUrl = "https://fi.jamix.cloud/apps/menuservice/rest/haku/public";
@@ -226,6 +226,7 @@ export async function getMenuOptions(req: Request, res: Response) {
     });
 
     if (!response.ok) {
+      logger.error({ status: response.status }, "Jamix search API error");
       responseStatus(res, 500, false, {
         cause: `Jamix API returned ${response.status}`,
       });
@@ -403,6 +404,10 @@ export async function getRestaurantPage(req: Request, res: Response) {
     });
 
     if (!menuResponse.ok) {
+      logger.error(
+        { status: menuResponse.status, customerId, kitchenId },
+        "Jamix menu API error",
+      );
       responseStatus(res, 500, false, {
         cause: `Menu API returned ${menuResponse.status}`,
       });

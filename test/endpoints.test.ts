@@ -2,6 +2,12 @@ import http from "http";
 
 const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 
+const GREEN = "\x1b[32m";
+const RED = "\x1b[31m";
+const YELLOW = "\x1b[33m";
+const RESET = "\x1b[0m";
+const DIM = "\x1b[2m";
+
 interface TestResult {
   endpoint: string;
   status: "pass" | "fail" | "skip";
@@ -97,16 +103,11 @@ const ENDPOINTS: EndpointSpec[] = [
   // ISS
   { path: "/iss/menus", category: "iss", validateShape: validateRestaurantListShape },
 
-  // Jamix
+  // Jamix (restaurant list only — menu test uses a dynamically discovered kitchen)
   {
     path: "/jamix/restaurants",
     category: "jamix",
     validateShape: validateRestaurantListShape,
-  },
-  {
-    path: "/jamix/menu/96773/12",
-    category: "jamix",
-    validateShape: validateJamixMenuShape,
   },
 ];
 
@@ -179,6 +180,112 @@ async function testEndpoint(spec: EndpointSpec): Promise<TestResult> {
   }
 }
 
+function printResult(result: TestResult) {
+  if (result.status === "pass") {
+    const line = `${GREEN}[+]${RESET} ${result.endpoint} ${DIM}(${result.duration}ms)${RESET}`;
+    console.log(line);
+  } else if (result.status === "skip") {
+    const line = `${YELLOW}[-]${RESET} ${result.endpoint} ${DIM}(${result.duration}ms)${RESET}`;
+    console.log(line);
+  } else {
+    const line = `${RED}[x]${RESET} ${result.endpoint} ${DIM}(${result.duration}ms)${RESET}`;
+    console.log(result.error ? `${line} — ${result.error}` : line);
+  }
+}
+
+/**
+ * Dynamically discover a Jamix kitchen and test its menu endpoint.
+ * Avoids hardcoding any specific customer/kitchen ID.
+ */
+async function runJamixMenuTest(): Promise<TestResult> {
+  const start = Date.now();
+  const endpoint = "/jamix/menu (dynamic)";
+  try {
+    const { status, body } = await fetchEndpoint("/jamix/restaurants");
+    if (status !== 200 || body.status === false) {
+      return {
+        endpoint,
+        status: "fail",
+        duration: Date.now() - start,
+        error: "Could not fetch restaurant list to discover a kitchen",
+      };
+    }
+
+    const restaurants = body.data?.restaurants || [];
+    if (restaurants.length === 0 || restaurants[0].kitchens?.length === 0) {
+      return {
+        endpoint,
+        status: "skip",
+        duration: Date.now() - start,
+        error: "No Jamix restaurants available",
+      };
+    }
+
+    const customer = restaurants[0];
+    const kitchen = customer.kitchens[0];
+    const menuPath = `/jamix/menu/${customer.customerId}/${kitchen.kitchenId}`;
+
+    const menuResult = await testEndpoint({
+      path: menuPath,
+      category: "jamix",
+      validateShape: validateJamixMenuShape,
+    });
+
+    return {
+      ...menuResult,
+      endpoint: `${endpoint} → ${menuPath}`,
+    };
+  } catch (err: any) {
+    return {
+      endpoint,
+      status: "fail",
+      duration: Date.now() - start,
+      error: err.message,
+    };
+  }
+}
+
+/**
+ * Test Jamix search filtering
+ */
+async function runJamixSearchTest(): Promise<TestResult> {
+  const start = Date.now();
+  const endpoint = "/jamix/{query}/restaurants";
+  try {
+    const { status, body } = await fetchEndpoint("/jamix/espoo/restaurants");
+    const duration = Date.now() - start;
+
+    if (status !== 200) {
+      return { endpoint, status: "fail", httpStatus: status, duration, error: `HTTP ${status}` };
+    }
+    if (body.status === false) {
+      return { endpoint, status: "fail", httpStatus: status, duration, error: `API error: ${body.cause}` };
+    }
+
+    const restaurants = body.data?.restaurants || [];
+    for (const customer of restaurants) {
+      for (const kitchen of customer.kitchens) {
+        const match =
+          kitchen.kitchenName?.toLowerCase().includes("espoo") ||
+          kitchen.address?.toLowerCase().includes("espoo") ||
+          kitchen.city?.toLowerCase().includes("espoo");
+        if (!match) {
+          return {
+            endpoint,
+            status: "fail",
+            duration,
+            error: `Search filter leaked: ${kitchen.kitchenName} (${kitchen.city}) doesn't match "espoo"`,
+          };
+        }
+      }
+    }
+
+    return { endpoint, status: "pass", httpStatus: status, duration };
+  } catch (err: any) {
+    return { endpoint, status: "fail", duration: Date.now() - start, error: err.message };
+  }
+}
+
 async function run() {
   const categories = process.argv.slice(2);
   let specs = ENDPOINTS;
@@ -187,7 +294,8 @@ async function run() {
     specs = ENDPOINTS.filter((s) => categories.includes(s.category));
   }
 
-  console.log(`Running ${specs.length} endpoint tests against ${BASE_URL}\n`);
+  const totalEstimate = specs.length + (categories.length === 0 || categories.includes("jamix") ? 2 : 0);
+  console.log(`Running ${totalEstimate} endpoint tests against ${BASE_URL}\n`);
 
   const concurrency = 5;
   const results: TestResult[] = [];
@@ -198,10 +306,7 @@ async function run() {
       const spec = queue.shift()!;
       const result = await testEndpoint(spec);
       results.push(result);
-
-      const icon = result.status === "pass" ? "+" : result.status === "skip" ? "-" : "x";
-      const line = `[${icon}] ${result.endpoint} (${result.duration}ms)`;
-      console.log(result.error ? `${line} — ${result.error}` : line);
+      printResult(result);
     }
   }
 
@@ -210,10 +315,24 @@ async function run() {
   );
   await Promise.all(workers);
 
+  // Jamix-specific tests (dynamic discovery, search filter)
+  if (categories.length === 0 || categories.includes("jamix")) {
+    const jamixMenu = await runJamixMenuTest();
+    results.push(jamixMenu);
+    printResult(jamixMenu);
+
+    const jamixSearch = await runJamixSearchTest();
+    results.push(jamixSearch);
+    printResult(jamixSearch);
+  }
+
   const passed = results.filter((r) => r.status === "pass").length;
   const failed = results.filter((r) => r.status === "fail").length;
+  const skipped = results.filter((r) => r.status === "skip").length;
 
-  console.log(`\n${passed} passed, ${failed} failed out of ${results.length} total`);
+  console.log(
+    `\n${GREEN}${passed} passed${RESET}, ${failed > 0 ? RED : ""}${failed} failed${RESET}${skipped > 0 ? `, ${YELLOW}${skipped} skipped${RESET}` : ""} out of ${results.length} total`,
+  );
   process.exit(failed > 0 ? 1 : 0);
 }
 
