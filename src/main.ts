@@ -11,7 +11,7 @@ import logger from "./utils/logger";
 const pkg = JSON.parse(
   readFileSync(join(__dirname, "..", "package.json"), "utf-8"),
 );
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const SELENIUM_ARGS = process.env.SELENIUM_ARGS || null;
 const asikkala = require("./handlers/asikkala").handleAsikkala;
 const syk = require("./handlers/syk").handleSyk;

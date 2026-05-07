@@ -33,10 +33,10 @@ npm start
 npm run production
 ```
 
-The server will start on `http://localhost:3001` by default.
+The server will start on `http://localhost:3000` by default.
 
 ### Accessing Documentation
-- **Swagger UI**: Visit `http://localhost:3001/api-docs` for interactive API documentation
+- **Swagger UI**: Visit `http://localhost:3000/api-docs` for interactive API documentation
 - **API Testing**: Use the built-in Swagger interface to test endpoints
 
 ## API Endpoints
@@ -269,7 +269,7 @@ const axios = require('axios');
 // Get current school menu
 async function getSchoolMenu() {
   try {
-    const response = await axios.get('http://localhost:3001/asikkala/menu');
+    const response = await axios.get('http://localhost:3000/asikkala/menu');
     if (response.data.status) {
       console.log('Menu retrieved:', response.data.data);
     } else {
@@ -284,7 +284,7 @@ async function getSchoolMenu() {
 async function getTodaysJamixMenu(customerId, kitchenId) {
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   try {
-    const response = await axios.get(`http://localhost:3001/jamix/menu/${customerId}/${kitchenId}?date=${today}`);
+    const response = await axios.get(`http://localhost:3000/jamix/menu/${customerId}/${kitchenId}?date=${today}`);
     if (response.data.status) {
       console.log('Today\'s menu:', response.data.data);
     } else {
@@ -306,7 +306,7 @@ async function getCurrentWeekJamixMenu(customerId, kitchenId) {
   const endDate = friday.toISOString().slice(0, 10).replace(/-/g, '');
 
   try {
-    const response = await axios.get(`http://localhost:3001/jamix/menu/${customerId}/${kitchenId}?date=${startDate}&date2=${endDate}`);
+    const response = await axios.get(`http://localhost:3000/jamix/menu/${customerId}/${kitchenId}?date=${startDate}&date2=${endDate}`);
     if (response.data.status) {
       console.log('Current week menu:', response.data.data);
     } else {
@@ -320,7 +320,7 @@ async function getCurrentWeekJamixMenu(customerId, kitchenId) {
 // Get list of all available menu providers
 async function getMenuProviders() {
   try {
-    const response = await axios.get('http://localhost:3001/menus');
+    const response = await axios.get('http://localhost:3000/menus');
     if (response.data.status) {
       console.log('Available menu providers:');
       response.data.data.providers.forEach(provider => {
@@ -351,7 +351,7 @@ from datetime import datetime, timedelta
 
 def get_menu():
     try:
-        response = requests.get('http://localhost:3001/asikkala/menu')
+        response = requests.get('http://localhost:3000/asikkala/menu')
         data = response.json()
 
         if data['status']:
@@ -373,7 +373,7 @@ def get_jamix_menu_today(customer_id, kitchen_id):
     """Get today's Jamix menu"""
     today = datetime.now().strftime('%Y%m%d')
     try:
-        response = requests.get(f'http://localhost:3001/jamix/menu/{customer_id}/{kitchen_id}?date={today}')
+        response = requests.get(f'http://localhost:3000/jamix/menu/{customer_id}/{kitchen_id}?date={today}')
         data = response.json()
 
         if data['status']:
@@ -398,7 +398,7 @@ def get_jamix_menu_week(customer_id, kitchen_id):
     end_date = friday.strftime('%Y%m%d')
 
     try:
-        response = requests.get(f'http://localhost:3001/jamix/menu/{customer_id}/{kitchen_id}?date={start_date}&date2={end_date}')
+        response = requests.get(f'http://localhost:3000/jamix/menu/{customer_id}/{kitchen_id}?date={start_date}&date2={end_date}')
         data = response.json()
 
         if data['status']:
@@ -413,7 +413,7 @@ def get_jamix_menu_week(customer_id, kitchen_id):
 def get_menu_providers():
     """Get list of all available menu providers"""
     try:
-        response = requests.get('http://localhost:3001/menus')
+        response = requests.get('http://localhost:3000/menus')
         data = response.json()
 
         if data['status']:
@@ -440,28 +440,28 @@ get_menu_providers()
 ### cURL
 ```bash
 # Get school menu
-curl -X GET "http://localhost:3001/asikkala/menu"
+curl -X GET "http://localhost:3000/asikkala/menu"
 
 # Get restaurant list from ISS
-curl -X GET "http://localhost:3001/iss/menus"
+curl -X GET "http://localhost:3000/iss/menus"
 
 # Get specific restaurant menu
-curl -X GET "http://localhost:3001/iss/menu/example-restaurant.com"
+curl -X GET "http://localhost:3000/iss/menu/example-restaurant.com"
 
 # Search Jamix restaurants
-curl -X GET "http://localhost:3001/jamix/pizza/restaurants"
+curl -X GET "http://localhost:3000/jamix/pizza/restaurants"
 
 # Get Jamix menu for specific date
-curl -X GET "http://localhost:3001/jamix/menu/123/456?date=20241225"
+curl -X GET "http://localhost:3000/jamix/menu/123/456?date=20241225"
 
 # Get Jamix menu for date range (week)
-curl -X GET "http://localhost:3001/jamix/menu/123/456?date=20241223&date2=20241229"
+curl -X GET "http://localhost:3000/jamix/menu/123/456?date=20241223&date2=20241229"
 
 # Get Jamix menu in English
-curl -X GET "http://localhost:3001/jamix/menu/123/456?lang=en"
+curl -X GET "http://localhost:3000/jamix/menu/123/456?lang=en"
 
 # Get complete list of all menu providers
-curl -X GET "http://localhost:3001/menus"
+curl -X GET "http://localhost:3000/menus"
 ```
 
 ### PHP
@@ -469,7 +469,7 @@ curl -X GET "http://localhost:3001/menus"
 <?php
 
 function getMenu($endpoint) {
-    $url = "http://localhost:3001/" . $endpoint;
+    $url = "http://localhost:3000/" . $endpoint;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -527,7 +527,7 @@ The API uses consistent error handling across all endpoints:
 
 ### Handling Errors in Code
 ```javascript
-const response = await fetch('http://localhost:3001/api/endpoint');
+const response = await fetch('http://localhost:3000/api/endpoint');
 
 if (!response.ok) {
   console.error(`HTTP Error: ${response.status}`);
