@@ -8,6 +8,9 @@ import swaggerJsdoc from "swagger-jsdoc";
 import { apiReference } from "@scalar/express-api-reference";
 import logger from "./utils/logger";
 
+const pkg = JSON.parse(
+  readFileSync(join(__dirname, "..", "package.json"), "utf-8"),
+);
 const PORT = process.env.PORT || 3001;
 const SELENIUM_ARGS = process.env.SELENIUM_ARGS || null;
 const asikkala = require("./handlers/asikkala").handleAsikkala;
@@ -40,7 +43,7 @@ const swaggerOptions = {
     openapi: "3.0.0",
     info: {
       title: "Food Menu API",
-      version: "1.2.2",
+      version: pkg.version,
       description:
         "This API provides additional food menus which are not available as JSON. This middleware converts them to JSON format.",
       license: {
@@ -55,8 +58,10 @@ const swaggerOptions = {
     ],
   },
   apis: [
+    "./src/main.ts",
     "./src/swagger-schemas.ts",
     "./src/handlers/*.ts",
+    "./build/main.js",
     "./build/swagger-schemas.js",
     "./build/handlers/*.js",
   ],
@@ -66,6 +71,11 @@ const swaggerSpecs = swaggerJsdoc(swaggerOptions);
 
 let app = express();
 app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+  res.setHeader("X-API-Version", pkg.version);
+  next();
+});
 
 // Serve raw OpenAPI spec
 app.get("/api-docs/openapi.json", (req, res) => {
@@ -116,7 +126,61 @@ app.use("/jamix/menu/:customerId/:kitchenId", jamix.getRestaurantPage);
 // Menu directory/list endpoint
 app.get("/menus", menuList.getMenuList);
 
-app.get("*", (req, res) => {
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API root
+ *     description: Returns API metadata including version, documentation link, and available resource paths
+ *     tags: [Meta]
+ *     responses:
+ *       200:
+ *         description: API info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 name:
+ *                   type: string
+ *                   example: Food Menu API
+ *                 version:
+ *                   type: string
+ *                   example: "1.2.2"
+ *                 docs:
+ *                   type: string
+ *                   example: /api-docs
+ *                 endpoints:
+ *                   type: object
+ *                   properties:
+ *                     menus:
+ *                       type: string
+ *                       example: /menus
+ *                     docs:
+ *                       type: string
+ *                       example: /api-docs
+ *                     openapi:
+ *                       type: string
+ *                       example: /api-docs/openapi.json
+ */
+app.get("/", (req, res) => {
+  res.json({
+    status: true,
+    name: "Food Menu API",
+    version: pkg.version,
+    docs: "/api-docs",
+    endpoints: {
+      menus: "/menus",
+      docs: "/api-docs",
+      openapi: "/api-docs/openapi.json",
+    },
+  });
+});
+
+app.use((req, res) => {
   res.status(404).json({ status: false, cause: "not found" });
 });
 
