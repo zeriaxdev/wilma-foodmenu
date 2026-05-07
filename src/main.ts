@@ -6,6 +6,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import swaggerJsdoc from "swagger-jsdoc";
 import { apiReference } from "@scalar/express-api-reference";
+import { readFileSync } from "fs";
+import { join } from "path";
 import logger from "./utils/logger";
 
 const pkg = JSON.parse(
