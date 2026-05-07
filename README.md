@@ -1,5 +1,9 @@
 # wilma-foodmenu
 
+[![Version](https://img.shields.io/github/package-json/v/zeriaxdev/wilma-foodmenu)](package.json)
+[![License](https://img.shields.io/github/license/zeriaxdev/wilma-foodmenu)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D24-brightgreen)](https://nodejs.org/)
+
 A middleware API that aggregates Finnish food menus from various sources (HTML, PDF, iCal, proprietary APIs) and serves them as unified JSON.
 
 ## Table of Contents
@@ -21,7 +25,7 @@ Originally forked from [wilmaplus/foodmenu](https://github.com/wilmaplus/foodmen
 
 ## Install
 
-Requires Node.js 16+.
+Requires Node.js 24+.
 
 ```
 npm install
