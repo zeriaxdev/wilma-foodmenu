@@ -27,7 +27,7 @@ export function responseStatus(
  * @param statusCode HTTP Status code
  * @param error Error
  */
-export function errorResponse(res: Response, statusCode = 200, error: any) {
+export function errorResponse(res: Response, statusCode = 500, error: any) {
   console.error(error);
   let extra: { [k: string]: any } = { cause: error.toString() };
   return res.status(statusCode).json(Object.assign({ status: false }, extra));
