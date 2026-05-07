@@ -8,12 +8,13 @@ import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
+import { Diet } from "../models/Diet";
 
 const dateRegex = /(\d{2})\.(\d{2})\.(\d{4})/;
 const weekRegex = /^v(?:ko|KO)\s+\d+$/i;
 const type = "asikkala";
 
-export function parse(html: string): Day[] | undefined {
+export function parse(html: string): { menu: Day[]; diets: Diet[] } | undefined {
   const document = parser.parse(html);
   const article = document.querySelector("article");
   if (article == null) return undefined;
@@ -47,5 +48,5 @@ export function parse(html: string): Day[] | undefined {
     }
   }
 
-  return items.length > 0 ? items : undefined;
+  return items.length > 0 ? { menu: items, diets: [] } : undefined;
 }

@@ -13,7 +13,9 @@ const dateRegex = /([0-9]+).([0-9]+)/;
 
 const type = "syk";
 
-export function parse(html: string): Day[] | undefined {
+import { Diet } from "../models/Diet";
+
+export function parse(html: string): { menu: Day[]; diets: Diet[] } | undefined {
   let document = parser.parse(html);
   let card = document.querySelector("div[class='secondary-bg-border']");
   if (card != null) {
@@ -50,7 +52,7 @@ export function parse(html: string): Day[] | undefined {
         }
       }
     });
-    return items;
+    return { menu: items, diets: [] };
   }
   return undefined;
 }

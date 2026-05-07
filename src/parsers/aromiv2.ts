@@ -5,7 +5,6 @@
 import moment from "moment";
 import { Day } from "../models/Day";
 import { Menu } from "../models/Menu";
-import { Moment } from "moment/moment";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
@@ -82,7 +81,7 @@ export async function parse(
         let items = Object.keys(rows).sort(
           (y1, y2) => parseFloat(y1) - parseFloat(y2)
         );
-        let lastDate: Moment | null = null;
+        let lastDate: string | null = null;
         let tempMenuList: Menu[] = [];
         let mealType = "Lounas";
         let tmpItems: Meal[] = [];
@@ -112,7 +111,7 @@ export async function parse(
                   days.push(new Day(lastDate, tempMenuList));
                   tempMenuList = [];
                 }
-                lastDate = moment(regexResult[0], "DD.MM.YYYY").startOf("day");
+                lastDate = moment(regexResult[0], "DD.MM.YYYY").startOf("day").format();
               }
             } else if (lastDate != null) {
               for (let meal of item) {
@@ -183,16 +182,8 @@ export async function parse(
           logger.warn({ err: e }, "Failed to parse diet info from PDF");
         }
         if (!pdf) {
-          days.sort((i1: Day, i2: Day) => {
-            return i1.date.unix() - i2.date.unix();
-          });
-          // Formatting date after sorting
-          let correctedDateDays = days;
-          correctedDateDays.forEach((item, index) => {
-            item.date = item.date.format() as any;
-            correctedDateDays[index] = item;
-          });
-          callback(correctedDateDays, diets);
+          days.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          callback(days, diets);
         }
       } else if (pdf.text) {
         // accumulate text items into rows object, per line
@@ -250,7 +241,7 @@ export async function parseRSSFeed(content: any) {
           if (title.match(dateRegex)) {
             let dateResults = dateRegex.exec(title);
             if (dateResults) {
-              let date = moment(dateResults[0], "DD.MM.YYYY").startOf("day");
+              let date = moment(dateResults[0], "DD.MM.YYYY").startOf("day").format();
               days.push(new Day(date, tempMenuList));
             }
           }
