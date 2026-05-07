@@ -1,6 +1,19 @@
+# ---- Build stage ----
+FROM node:24-alpine AS build
+
+RUN apk add --no-cache git make gcc g++ python3
+
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run production
+
+# ---- Runtime stage ----
 FROM node:24-alpine
 
-# Install Chromium, Ghostscript, fonts, build tools, and tini
 RUN apk add --no-cache \
     chromium \
     chromium-chromedriver \
@@ -12,11 +25,6 @@ RUN apk add --no-cache \
     ghostscript \
     qpdf \
     tini \
-    git \
-    make \
-    gcc \
-    g++ \
-    python3 \
     ca-certificates \
     tzdata \
     mailcap
@@ -32,16 +40,12 @@ WORKDIR /usr/src/app
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/
 
-# Install dependencies before copying full source (better layer caching)
-COPY --chown=chrome:chrome package.json ./
+COPY --from=build --chown=chrome:chrome /usr/src/app/build ./build
+COPY --from=build --chown=chrome:chrome /usr/src/app/node_modules ./node_modules
+COPY --from=build --chown=chrome:chrome /usr/src/app/package.json ./
 
 USER chrome
-RUN npm install
 
-COPY --chown=chrome:chrome . .
-RUN npm run build
-
-# no-sandbox required — Docker is already an isolated environment
 ENV SELENIUM_ARGS="disk-cache-dir=/tmp/seleniumcache,disable-translate,disable-sync,no-first-run,safebrowsing-disable-auto-update,disable-background-networking,no-sandbox,disable-setuid-sandbox"
 
 EXPOSE 3000

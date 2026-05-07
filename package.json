@@ -13,7 +13,8 @@
     "dev": "npx tsx watch src/main.ts",
     "test": "ts-node --project test/tsconfig.json test/endpoints.test.ts",
     "test:jamix": "ts-node --project test/tsconfig.json test/endpoints.test.ts jamix",
-    "test:schools": "ts-node --project test/tsconfig.json test/endpoints.test.ts school"
+    "test:schools": "ts-node --project test/tsconfig.json test/endpoints.test.ts school",
+    "test:content": "ts-node --project test/tsconfig.json test/content.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +29,6 @@
     "ical-expander": "^3.1.0",
     "moment": "2.29.4",
     "needle": "^3.3.1",
-    "node-fetch": "^2.7.0",
     "node-html-parser": "^6.1.13",
     "node-ts-cache": "^4.2.3",
     "node-ts-cache-storage-memory": "^4.2.3",
@@ -42,7 +42,6 @@
     "@types/he": "^1.2.3",
     "@types/needle": "^3.3.0",
     "@types/node": "^22.15.3",
-    "@types/node-fetch": "^2.6.12",
     "@types/retry": "^0.12.5",
     "@types/selenium-webdriver": "^4.1.27",
     "@types/swagger-jsdoc": "^6.0.4",

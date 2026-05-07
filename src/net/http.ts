@@ -28,7 +28,7 @@ export class Http {
       (content) => {
         if (content) callback(null, content);
         else {
-          needle.get(url, (error, response) => {
+          needle.get(url, { follow_max: 5 }, (error, response) => {
             if (error) {
               callback(error, response);
               return;
