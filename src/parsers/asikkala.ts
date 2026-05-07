@@ -8,6 +8,7 @@ import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
+import logger from "../utils/logger";
 
 const dateRegex = /[0-9]+.[0-9]+.[0-9]{4}/;
 const whitespace = " ";
@@ -32,7 +33,7 @@ export function parse(html: string): Day[] | undefined {
             let item = regexResult[0];
             date = moment(item, "DD.MM.YYYY").startOf("day").format();
             begin = true;
-            console.log({ begin, date });
+            logger.debug({ begin, date }, "Asikkala: found menu start date");
           }
         });
         if (begin) {

@@ -2,6 +2,7 @@
  * Copyright (c) 2021 wilmaplus-foodmenu, developed by @developerfromjokela, for Wilma Plus mobile app
  */
 import { Response } from "express";
+import logger from "./logger";
 
 /**
  * Internal command for making JSON response
@@ -28,7 +29,7 @@ export function responseStatus(
  * @param error Error
  */
 export function errorResponse(res: Response, statusCode = 200, error: any) {
-  console.error(error);
+  logger.error({ err: error, statusCode }, "Request error");
   let extra: { [k: string]: any } = { cause: error.toString() };
   return res.status(statusCode).json(Object.assign({ status: false }, extra));
 }

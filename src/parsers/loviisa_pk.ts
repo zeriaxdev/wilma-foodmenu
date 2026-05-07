@@ -9,6 +9,7 @@ import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { removeImagesFromPDF } from "../utils/pdf";
+import logger from "../utils/logger";
 const pdfParser = require("pdfreader");
 
 /*const dateRegex = /[0-9]+\.[0-9]+\.[0-9]{4}/;
@@ -34,7 +35,7 @@ export async function parse(
   try {
     content = await removeImagesFromPDF(content);
   } catch (e) {
-    console.error(e);
+    logger.error({ err: e }, "Failed to remove images from PDF");
   }
   new pdfParser.PdfReader().parseBuffer(
     content,
@@ -104,7 +105,7 @@ export async function parse(
           bundle.weeks.forEach((week) => {
             bundle.meals.forEach((meal) => {
               let momentDate = moment().startOf("day");
-              console.log({ m: moment().week(), w2: week });
+              logger.debug({ currentWeek: moment().week(), targetWeek: week }, "Loviisa: processing week");
               momentDate.set("week", week);
               switch (meal.day.toLowerCase()) {
                 case "ma":

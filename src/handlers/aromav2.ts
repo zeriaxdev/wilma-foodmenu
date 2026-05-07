@@ -4,6 +4,7 @@
 
 import { Request, Response } from "express";
 import { responseStatus } from "../utils/response_utilities";
+import logger from "../utils/logger";
 import {
   Builder,
   By,
@@ -69,8 +70,7 @@ const chromeConfig = {
 };
 
 const logSeleniumErr = (error: any, origin: any) => {
-  if (process.env.NODE_ENV === "dev")
-    console.error("[SELENIUM]", origin, error);
+  logger.error({ err: error, origin }, "Selenium error");
 };
 
 const getSeleniumDriver = () => {
@@ -353,7 +353,7 @@ export async function getMenuOptions(req: Request, res: Response) {
           url + (fullUrl ? "" : "/Default.aspx"),
         );
       } catch (e) {
-        console.log("Falling back to old method!", e);
+        logger.warn({ err: e }, "Falling back to Selenium method");
         driver = getSeleniumDriver();
         await driver.get(url + (fullUrl ? "" : "/Default.aspx"));
         restaurants = await getRestaurantList(driver);
@@ -524,8 +524,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
           id,
         );
       } catch (e) {
-        // From now on, selenium method is only kept as backup
-        console.log(e);
+        logger.warn({ err: e }, "Direct PDF link failed, trying Selenium");
         driver = getSeleniumDriver();
         try {
           await driver.get(url + (fullUrl ? "" : "/Default.aspx"));
@@ -540,7 +539,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
               } catch (ignored) {}
             }, 500);
           }
-          console.log(e);
+          logger.error({ err: e }, "Selenium fallback also failed");
         }
       }
       if (!pdfUrl) {

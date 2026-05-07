@@ -12,6 +12,7 @@ import { Diet } from "../models/Diet";
 import { removeImagesFromPDF } from "../utils/pdf";
 import * as parser from "node-html-parser";
 import { Restaurant } from "../models/Restaurant";
+import logger from "../utils/logger";
 
 const pdfParser = require("pdfreader");
 
@@ -62,7 +63,7 @@ export async function parse(
   try {
     content = await removeImagesFromPDF(content);
   } catch (e) {
-    console.error(e);
+    logger.error({ err: e }, "Failed to remove images from PDF");
   }
   new pdfParser.PdfReader().parseBuffer(
     content,
@@ -73,7 +74,7 @@ export async function parse(
           callback([], []);
           return;
         }
-        console.error(pdfError);
+        logger.error({ err: pdfError }, "PDF parse error");
         callback(undefined, undefined);
         return;
       }
@@ -179,7 +180,7 @@ export async function parse(
             }
           }
         } catch (e) {
-          console.error(e);
+          logger.warn({ err: e }, "Failed to parse diet info from PDF");
         }
         if (!pdf) {
           days.sort((i1: Day, i2: Day) => {
@@ -259,7 +260,7 @@ export async function parseRSSFeed(content: any) {
     }
     return undefined;
   } catch (e) {
-    console.error(e);
+    logger.error({ err: e }, "Failed to parse RSS feed");
     return undefined;
   }
 }
