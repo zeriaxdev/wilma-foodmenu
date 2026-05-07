@@ -4,7 +4,7 @@
   "description": "This API provides additional food menus which are not available as JSON as well as unifies other existing food menus into one.\nThis middleware converts them to JSON format.",
   "main": "build/main.js",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "build": "tsc --project ./",

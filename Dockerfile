@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:24-alpine
 
 # Install Chromium, Ghostscript, fonts, build tools, and tini
 RUN apk add --no-cache \
