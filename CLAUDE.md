@@ -52,7 +52,7 @@ Set `TEST_BASE_URL` to test against a different instance.
 
 ## Adding a provider
 
-1. Create `src/parsers/<name>.ts` — returns `Day[]` or `{ menu: Day[], diets: Diet[] }`
+1. Create `src/parsers/<name>.ts` — returns `{ menu: Day[], diets: Diet[] }`
 2. Create `src/handlers/<name>.ts` — add JSDoc `@swagger` block, call parser, use `responseStatus`
 3. Register route in `src/main.ts`
 4. Add entry to `src/handlers/menu_list.ts`
@@ -60,12 +60,12 @@ Set `TEST_BASE_URL` to test against a different instance.
 
 ## Response shape
 
-All endpoints return:
+All menu endpoints return:
 ```json
 { "status": true, "menu": [...], "diets": [...] }
 ```
 
-Jamix wraps in `data`: `{ "status": true, "data": { "menu": [...], "diets": [...] } }`
+All parsers return `{ menu: Day[], diets: Diet[] }` — handlers pass through directly.
 
 ## Node / TypeScript
 

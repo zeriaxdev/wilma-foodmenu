@@ -84,7 +84,7 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
             });
 
             if (meals.length > 0) {
-                items.push(new Day(currentDayDate?.toISOString(true), [new Menu('Lounas', meals)]));
+                items.push(new Day(currentDayDate!.toISOString(true), [new Menu('Lounas', meals)]));
             }
             currentDayDate = undefined;
         });

@@ -69,10 +69,8 @@ function validateJamixMenuShape(data: any): string | null {
 }
 
 function validateRestaurantListShape(data: any): string | null {
-  if (!data.restaurants && !Array.isArray(data))
-    return "expected restaurants array";
-  const list = data.restaurants || data;
-  if (!Array.isArray(list)) return "restaurants is not an array";
+  const list = data.restaurants || data.menus;
+  if (!list || !Array.isArray(list)) return "expected restaurants or menus array";
   return null;
 }
 
@@ -156,8 +154,8 @@ async function testEndpoint(spec: EndpointSpec): Promise<TestResult> {
       };
     }
 
-    if (spec.validateShape && body.data) {
-      const shapeError = spec.validateShape(body.data);
+    if (spec.validateShape) {
+      const shapeError = spec.validateShape(body);
       if (shapeError) {
         return {
           endpoint: spec.path,
@@ -211,7 +209,7 @@ async function runJamixMenuTest(): Promise<TestResult> {
       };
     }
 
-    const restaurants = body.data?.restaurants || [];
+    const restaurants = body.restaurants || [];
     if (restaurants.length === 0 || restaurants[0].kitchens?.length === 0) {
       return {
         endpoint,
@@ -262,7 +260,7 @@ async function runJamixSearchTest(): Promise<TestResult> {
       return { endpoint, status: "fail", httpStatus: status, duration, error: `API error: ${body.cause}` };
     }
 
-    const restaurants = body.data?.restaurants || [];
+    const restaurants = body.restaurants || [];
     for (const customer of restaurants) {
       for (const kitchen of customer.kitchens) {
         const match =

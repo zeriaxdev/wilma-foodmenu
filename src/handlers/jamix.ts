@@ -122,32 +122,29 @@ interface CustomerRestaurant {
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     restaurants:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           customerId:
- *                             type: string
- *                             example: "96773"
- *                           kitchens:
- *                             type: array
- *                             items:
- *                               type: object
- *                               properties:
- *                                 kitchenName:
- *                                   type: string
- *                                   example: "OMNIA Timantti (Leppävaara)"
- *                                 kitchenId:
- *                                   type: number
- *                                   example: 12
- *                                 address:
- *                                   type: string
- *                                 city:
- *                                   type: string
+ *                 restaurants:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       customerId:
+ *                         type: string
+ *                         example: "96773"
+ *                       kitchens:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             kitchenName:
+ *                               type: string
+ *                               example: "OMNIA Timantti (Leppävaara)"
+ *                             kitchenId:
+ *                               type: number
+ *                               example: 12
+ *                             address:
+ *                               type: string
+ *                             city:
+ *                               type: string
  *       500:
  *         description: Server error
  *         content:
@@ -178,29 +175,26 @@ interface CustomerRestaurant {
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     restaurants:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           customerId:
- *                             type: string
- *                           kitchens:
- *                             type: array
- *                             items:
- *                               type: object
- *                               properties:
- *                                 kitchenName:
- *                                   type: string
- *                                 kitchenId:
- *                                   type: number
- *                                 address:
- *                                   type: string
- *                                 city:
- *                                   type: string
+ *                 restaurants:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       customerId:
+ *                         type: string
+ *                       kitchens:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             kitchenName:
+ *                               type: string
+ *                             kitchenId:
+ *                               type: number
+ *                             address:
+ *                               type: string
+ *                             city:
+ *                               type: string
  *       500:
  *         description: Server error
  *         content:
@@ -215,7 +209,7 @@ export async function getMenuOptions(req: Request, res: Response) {
     const cached = await userCache.getItem<CustomerRestaurant[]>(hashKey);
 
     if (cached) {
-      responseStatus(res, 200, true, { data: { restaurants: cached } });
+      responseStatus(res, 200, true, { restaurants: cached });
       return;
     }
 
@@ -242,7 +236,7 @@ export async function getMenuOptions(req: Request, res: Response) {
     }
 
     await userCache.setItem(hashKey, restaurants, { ttl: 3600 });
-    responseStatus(res, 200, true, { data: { restaurants } });
+    responseStatus(res, 200, true, { restaurants });
   } catch (error: any) {
     errorResponse(res, 500, error);
   }
@@ -345,17 +339,14 @@ function filterRestaurants(
  *                 status:
  *                   type: boolean
  *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     menu:
- *                       type: array
- *                       items:
- *                         $ref: '#/components/schemas/Day'
- *                     diets:
- *                       type: array
- *                       items:
- *                         $ref: '#/components/schemas/Diet'
+ *                 menu:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Day'
+ *                 diets:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Diet'
  *       400:
  *         description: Missing required parameters
  *         content:
@@ -390,7 +381,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
     const cached = await userCache.getItem(hashKey);
 
     if (cached) {
-      responseStatus(res, 200, true, { data: cached });
+      responseStatus(res, 200, true, cached);
       return;
     }
 
@@ -418,7 +409,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
 
     if (!data || data.length === 0) {
       const empty = { menu: [], diets: [] };
-      responseStatus(res, 200, true, { data: empty });
+      responseStatus(res, 200, true, empty);
       return;
     }
 
@@ -428,7 +419,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
 
     const result = { menu: days, diets };
     await userCache.setItem(hashKey, result, { ttl: 3600 });
-    responseStatus(res, 200, true, { data: result });
+    responseStatus(res, 200, true, result);
   } catch (error: any) {
     errorResponse(res, 500, error);
   }

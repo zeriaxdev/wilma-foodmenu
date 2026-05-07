@@ -39,7 +39,7 @@ export function handleAsikkala(req: Request, res: Response) {
     }
     let parsedMenu = parse(response.body);
     if (parsedMenu !== undefined) {
-      responseStatus(res, 200, true, { menu: parsedMenu, diets: [] });
+      responseStatus(res, 200, true, parsedMenu);
     } else {
       errorResponse(res, 500, "Unable to parse menu!");
     }

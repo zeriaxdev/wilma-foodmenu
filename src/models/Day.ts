@@ -5,10 +5,10 @@
 import { Menu } from "./Menu";
 
 export class Day {
-  date: any;
+  date: string;
   menus: Menu[];
 
-  constructor(date: any, menus: Menu[]) {
+  constructor(date: string, menus: Menu[]) {
     this.date = date;
     this.menus = menus;
   }

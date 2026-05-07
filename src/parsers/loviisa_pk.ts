@@ -138,9 +138,10 @@ export async function parse(
                     meal.meal
                   )
                 );
+              const dateStr = momentDate.format();
               if (meal.valipala) {
                 days.push(
-                  new Day(momentDate, [
+                  new Day(dateStr, [
                     new Menu("Lounas", mainMeals),
                     new Menu("Välipala", [
                       new Meal(
@@ -153,22 +154,14 @@ export async function parse(
                   ])
                 );
               } else {
-                days.push(new Day(momentDate, [new Menu("Lounas", mainMeals)]));
+                days.push(new Day(dateStr, [new Menu("Lounas", mainMeals)]));
               }
             });
           });
         });
         if (!pdf) {
-          days.sort((i1: Day, i2: Day) => {
-            return i1.date.unix() - i2.date.unix();
-          });
-          // Formatting date after sorting
-          let correctedDateDays = days;
-          correctedDateDays.forEach((item, index) => {
-            item.date = item.date.format() as any;
-            correctedDateDays[index] = item;
-          });
-          callback(correctedDateDays);
+          days.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          callback(days);
         }
       } else if (pdf.text) {
         // accumulate text items into rows object, per line
