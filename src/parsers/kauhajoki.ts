@@ -4,11 +4,11 @@
 
 import { Day } from "../models/Day";
 import { Diet } from "../models/Diet";
-import moment from "moment";
 // @ts-ignore
 import icsToJson from "ics-to-json";
 const IcalExpander = require("ical-expander");
 import { HashUtils } from "../crypto/hash";
+import { startOfISOWeek, addDays, formatLocalISO, startOfDay } from "../utils/date";
 const type = "kauhajoki";
 
 /**
@@ -19,10 +19,11 @@ export function parse(
   content: string
 ): { menu: Day[]; diets: Diet[] } | undefined {
   let days: Day[] = [];
-  let rangeStart = moment().subtract(1, "week").startOf("week").startOf("day");
-  let rangeEnd = moment().add(2, "week").endOf("week").startOf("day");
+  const now = new Date();
+  let rangeStart = addDays(startOfISOWeek(now), -7);
+  let rangeEnd = addDays(startOfISOWeek(now), 20);
   const icalExpander = new IcalExpander({ ics: content });
-  const events = icalExpander.between(rangeStart.toDate(), rangeEnd.toDate());
+  const events = icalExpander.between(rangeStart, rangeEnd);
   const mappedEvents = events.events.map((e: any) => ({
     startDate: e.startDate,
     endDate: e.endDate,
@@ -45,7 +46,7 @@ export function parse(
   allEvents.map((event: any) => {
     days.push(
       new Day(
-        moment(event.startDate.toJSDate()).startOf("day").toISOString(true),
+        formatLocalISO(startOfDay(event.startDate.toJSDate())),
         [
           {
             name: "Lounas",

@@ -3,19 +3,29 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { removeImagesFromPDF } from "../utils/pdf";
 import logger from "../utils/logger";
+import { dateFromISOWeek, formatLocalISO, getISOWeek } from "../utils/date";
 const pdfParser = require("pdfreader");
 
-/*const dateRegex = /[0-9]+\.[0-9]+\.[0-9]{4}/;
-const whitespace = " ";*/
-
 const type = "loviisa_pk";
+
+function dayAbbrevToWeekday(abbrev: string): number {
+  switch (abbrev.toLowerCase()) {
+    case "ma": return 1;
+    case "ti": return 2;
+    case "ke": return 3;
+    case "to": return 4;
+    case "pe": return 5;
+    case "la": return 6;
+    case "su": return 7;
+    default: return 0;
+  }
+}
 
 export function parsePDFLink(html: string): string | undefined {
   let document = parser.parse(html);
@@ -28,10 +38,8 @@ export async function parse(
   content: any,
   callback: (content: Day[] | undefined) => void
 ) {
-  let rows: any = {}; // indexed by y-position
+  let rows: any = {};
   let days: Day[] = [];
-  // Due to a bug in PDF parser, images cause it not to parse any text.
-  // Removing images before parsing helps to circumvent this issue, until dev behind the lib fixes that issue,
   try {
     content = await removeImagesFromPDF(content);
   } catch (e) {
@@ -67,7 +75,6 @@ export async function parse(
           let item = rows[key];
           if (item.length > 0) {
             if (item[0].text.includes("viikko")) {
-              // Found week
               if (weekStarted) {
                 weekBundles.push({ weeks, meals });
                 weeks = [];
@@ -87,7 +94,6 @@ export async function parse(
               let valipala: string | null = null;
               item.forEach((rowCol: { x: number; text: string }) => {
                 if (rowCol.x < 4 && rowCol.x > 2) {
-                  // Weekday
                   weekDay = rowCol.text;
                 } else if (rowCol.x > 3.5 && rowCol.x < 5) {
                   meal = rowCol.text;
@@ -104,32 +110,11 @@ export async function parse(
         weekBundles.forEach((bundle) => {
           bundle.weeks.forEach((week) => {
             bundle.meals.forEach((meal) => {
-              let momentDate = moment().startOf("day");
-              logger.debug({ currentWeek: moment().week(), targetWeek: week }, "Loviisa: processing week");
-              momentDate.set("week", week);
-              switch (meal.day.toLowerCase()) {
-                case "ma":
-                  momentDate.set("weekday", 1);
-                  break;
-                case "ti":
-                  momentDate.set("weekday", 2);
-                  break;
-                case "ke":
-                  momentDate.set("weekday", 3);
-                  break;
-                case "to":
-                  momentDate.set("weekday", 4);
-                  break;
-                case "pe":
-                  momentDate.set("weekday", 5);
-                  break;
-                case "la":
-                  momentDate.set("weekday", 6);
-                  break;
-                case "su":
-                  momentDate.set("weekday", 0);
-                  break;
-              }
+              const year = new Date().getFullYear();
+              const weekday = dayAbbrevToWeekday(meal.day);
+              if (weekday === 0) return;
+              logger.debug({ currentWeek: getISOWeek(new Date()), targetWeek: week }, "Loviisa: processing week");
+              const dateStr = formatLocalISO(dateFromISOWeek(year, week, weekday));
               let mainMeals = [];
               if (meal.meal)
                 mainMeals.push(
@@ -138,7 +123,6 @@ export async function parse(
                     meal.meal
                   )
                 );
-              const dateStr = momentDate.format();
               if (meal.valipala) {
                 days.push(
                   new Day(dateStr, [
@@ -164,7 +148,6 @@ export async function parse(
           callback(days);
         }
       } else if (pdf.text) {
-        // accumulate text items into rows object, per line
         (rows[pdf.y] = rows[pdf.y] || []).push({ text: pdf.text, x: pdf.x });
       }
     }

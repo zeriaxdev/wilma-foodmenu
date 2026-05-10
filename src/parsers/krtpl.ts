@@ -3,32 +3,24 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
+import { dateFromISOWeek, formatLocalISO } from "../utils/date";
 
 const type = "krtpl";
 
-function convertDayName(name: string) {
+function dayNameToWeekday(name: string): number {
   switch (name) {
-    case "maanantai":
-      return "monday";
-    case "tiistai":
-      return "tuesday";
-    case "keskiviikko":
-      return "wednesday";
-    case "torstai":
-      return "thursday";
-    case "perjantai":
-      return "friday";
-    case "lauantai":
-      return "saturday";
-    case "sunnuntai":
-      return "sunday";
-    default:
-      return "";
+    case "maanantai": return 1;
+    case "tiistai": return 2;
+    case "keskiviikko": return 3;
+    case "torstai": return 4;
+    case "perjantai": return 5;
+    case "lauantai": return 6;
+    case "sunnuntai": return 7;
+    default: return 0;
   }
 }
 
@@ -43,7 +35,6 @@ export function parse(
     let weekNum =
       weekBox.querySelector(".lunch-current-week-num")?.text.trim() || undefined;
     let dietsHtml = weekBox.querySelector(".shortcuts");
-    // Parse diets
     if (diets.length < 1 && dietsHtml != null) {
       let splittedDiets = dietsHtml.text.trim().split(", ");
       splittedDiets.forEach((splittedDiet) => {
@@ -55,17 +46,19 @@ export function parse(
       let foodBox = weekBox.querySelectorAll(".col-md-12");
       foodBox.forEach((food) => {
         if (weekNum != null) {
-          let timestamp = moment()
-            .week(parseInt(weekNum) + 1)
-            .day(convertDayName(food.classNames[food.classNames.length - 1]))
-            .startOf("day");
+          const year = new Date().getFullYear();
+          const weekday = dayNameToWeekday(food.classNames[food.classNames.length - 1]);
+          if (weekday === 0) return;
+          const dateStr = formatLocalISO(
+            dateFromISOWeek(year, parseInt(weekNum) + 1, weekday)
+          );
           let txtRows = food.querySelectorAll("p");
           let combinedContent = "";
           txtRows.forEach((content) => {
             combinedContent += content.text + "\n";
           });
           items.push(
-            new Day(timestamp.toISOString(true), [
+            new Day(dateStr, [
               {
                 name: "Lounas",
                 meals: [

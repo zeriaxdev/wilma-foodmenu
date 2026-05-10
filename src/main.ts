@@ -16,14 +16,15 @@ const pkg = JSON.parse(
 const PORT = process.env.PORT || 3000;
 const SELENIUM_ARGS = process.env.SELENIUM_ARGS || null;
 const asikkala = require("./handlers/asikkala").handleAsikkala;
-const syk = require("./handlers/syk").handleSyk;
+// Upstream dead — commented out until sites are fixed
+// const syk = require("./handlers/syk").handleSyk;
 const tyk = require("./handlers/tyk").handleTyk;
 const mayk = require("./handlers/mayk").handleMayk;
 const phyk = require("./handlers/phyk").handlePhyk;
-const poytyaps = require("./handlers/poytyaps").handlePoytya_PS;
+// const poytyaps = require("./handlers/poytyaps").handlePoytya_PS;
 const kauhajoki = require("./handlers/kauhajoki").handleKauhajoki;
 const steiner = require("./handlers/steiner").handleSteiner;
-const krtpl = require("./handlers/krtpl").handleKrtpl;
+// const krtpl = require("./handlers/krtpl").handleKrtpl;
 const lookiKbp = require("./handlers/looki-html").handleLookiKbp;
 const pyhtaa = require("./handlers/pyhtaa").handlePyhtaa;
 const kastelli = require("./handlers/kastelli").handleKastelli;
@@ -95,14 +96,14 @@ app.use(
 );
 
 app.get("/asikkala/menu", asikkala);
-app.get("/syk/menu", syk);
+// app.get("/syk/menu", syk);
 app.get("/steiner/menu", steiner);
 app.get("/pyhtaa/menu", pyhtaa);
-app.get("/krtpl/menu", krtpl);
+// app.get("/krtpl/menu", krtpl);
 app.get("/tyk/menu", tyk);
 app.get("/mayk/menu", mayk);
 app.get("/phyk/menu", phyk);
-app.get("/poytyaps/menu", poytyaps);
+// app.get("/poytyaps/menu", poytyaps);
 app.get("/kauhajoki/menu", kauhajoki);
 app.get("/looki/:endpoint/menu", lookiKbp);
 app.get("/kastelli/menu", kastelli);

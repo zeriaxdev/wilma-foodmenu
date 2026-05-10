@@ -3,7 +3,6 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
@@ -14,6 +13,7 @@ const dateRegex = /([0-9]+).([0-9]+)/;
 const type = "syk";
 
 import { Diet } from "../models/Diet";
+import { parseDM, formatLocalISO } from "../utils/date";
 
 export function parse(html: string): { menu: Day[]; diets: Diet[] } | undefined {
   let document = parser.parse(html);
@@ -29,8 +29,8 @@ export function parse(html: string): { menu: Day[]; diets: Diet[] } | undefined 
         item.childNodes.forEach((node) => {
           let regexResult = dateRegex.exec(node.text);
           if (regexResult != null) {
-            let momentDate = moment(regexResult[0], "DD.MM").startOf("day");
-            date = momentDate.format();
+            date = formatLocalISO(parseDM(regexResult[0]));
+
             begin = true;
           }
         });

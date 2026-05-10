@@ -3,13 +3,12 @@
  */
 
 import * as parser from 'node-html-parser'
-import moment from 'moment';
 import {Day} from "../models/Day";
-import {Moment} from "moment/moment";
 import {Menu} from "../models/Menu";
 import {HashUtils} from "../crypto/hash";
 import {Diet} from "../models/Diet";
 import {Meal} from "../models/Meal";
+import {parseDMY, formatLocalISO} from "../utils/date";
 
 const dateRegex = /([0-9]+).([0-9]+).([0-9]{4})/;
 const type = "phyk";
@@ -20,14 +19,14 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
     if (contentBox !== null) {
         let items: Day[] = [];
         let children = contentBox.querySelectorAll('*');
-        let currentDayDate: undefined|Moment = undefined;
+        let currentDayDate: string | undefined = undefined;
         children.forEach(child => {
             if (child.tagName.toLowerCase() === 'h2' && !currentDayDate) {
                 let textContent = child.textContent;
                 if (textContent) {
                     let regexResult = dateRegex.exec(textContent);
                     if (regexResult != null)
-                        currentDayDate = moment(regexResult[0], "DD.MM.YYYY").startOf('day');
+                        currentDayDate = formatLocalISO(parseDMY(regexResult[0]));
                 }
             } else if (child.tagName.toLowerCase() === 'ul' && currentDayDate !== undefined) {
                 let meals: Meal[] = [];
@@ -39,7 +38,7 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
                         meals.push(new Meal(HashUtils.sha1Digest(type+'_'+mealText), mealText));
                     }
                 });
-                items.push(new Day(currentDayDate.toISOString(true), [new Menu('Lounas', meals)]));
+                items.push(new Day(currentDayDate, [new Menu('Lounas', meals)]));
                 currentDayDate = undefined;
             }
         });

@@ -12,7 +12,7 @@ import { Diet } from "../models/Diet";
 import { HashUtils } from "../crypto/hash";
 import { CacheContainer } from "node-ts-cache";
 import { MemoryStorage } from "node-ts-cache-storage-memory";
-import moment from "moment";
+import { parseYYYYMMDD, formatLocalISO, startOfDay } from "../utils/date";
 
 const searchUrl = "https://fi.jamix.cloud/apps/menuservice/rest/haku/public";
 const menuBaseUrl = "https://fi.jamix.cloud/apps/menuservice/rest/haku/menu";
@@ -538,24 +538,15 @@ function parseMenuData(kitchen: JamixMenuResponse): {
   }
 
   // Sort chronologically
-  days.sort((a, b) => moment(a.date).diff(moment(b.date)));
+  days.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return { days, diets: Array.from(dietsSet.values()) };
 }
 
-/**
- * Format a YYYYMMDD number into ISO 8601 date string with timezone,
- * consistent with other parsers (e.g. "2026-05-04T00:00:00.000+03:00")
- */
 function formatDate(dateNum: number): string {
   const s = dateNum.toString();
   if (s.length !== 8) {
-    return moment(dateNum).startOf("day").format();
+    return formatLocalISO(startOfDay(new Date(dateNum)));
   }
-  return moment(
-    `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`,
-    "YYYY-MM-DD",
-  )
-    .startOf("day")
-    .format();
+  return formatLocalISO(parseYYYYMMDD(dateNum));
 }

@@ -3,20 +3,19 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
-import { Moment } from "moment/moment";
 import { Menu } from "../models/Menu";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
 import he from "he";
+import { parseDMY, formatLocalISO, addDays } from "../utils/date";
 
-const dateRegex = /\(([0-9]+).([0-9]+).([0-9]{4})\)/;
+const dateRegex = /\((\d+)\.\S*?(\d+)\.(\d{4})\)/;
 const dietRegex = /([A-Z]+) = (.*)/;
 const type = "tyk_yk";
 
 export function parse(
-  html: string
+  html: string,
 ): { menu: Day[]; diets: Diet[] } | undefined {
   let document = parser.parse(html);
   let textBox = document.querySelector('div[class="text"]');
@@ -26,7 +25,7 @@ export function parse(
     let childElements = textBox.querySelectorAll("*");
     let state: {
       activeWeek: boolean;
-      currentWeekDate: undefined | Moment;
+      currentWeekDate: Date | undefined;
       currentWeekPos: number;
     } = { activeWeek: false, currentWeekDate: undefined, currentWeekPos: 0 };
     childElements.forEach((i) => {
@@ -36,10 +35,9 @@ export function parse(
           if (!state.activeWeek) {
             let regexResult = dateRegex.exec(textContent);
             if (regexResult != null) {
-              state.currentWeekDate = moment(
-                regexResult[0],
-                "DD.MM.YYYY"
-              ).startOf("day");
+              state.currentWeekDate = parseDMY(
+                `${regexResult[1]}.${regexResult[2]}.${regexResult[3]}`,
+              );
               state.activeWeek = true;
               state.currentWeekPos = 0;
             } else if (textContent.match(dietRegex) && diets.length < 1) {
@@ -54,23 +52,23 @@ export function parse(
             i.querySelector("strong") === null
           ) {
             if (state.currentWeekPos !== 0)
-              state.currentWeekDate.add(1, "days");
+              state.currentWeekDate = addDays(state.currentWeekDate, 1);
             state.currentWeekPos++;
-            let correctedContent = he.decode(textContent).trim();
+            let correctedContent = he.decode(textContent).replace(/\s+/g, " ").trim();
+            if (!correctedContent) return;
             items.push(
-              new Day(state.currentWeekDate.toISOString(true), [
+              new Day(formatLocalISO(state.currentWeekDate), [
                 new Menu("Lounas", [
                   {
                     name: correctedContent,
                     id: HashUtils.sha1Digest(type + "_" + correctedContent),
                   },
                 ]),
-              ])
+              ]),
             );
           }
         }
       } else if (i.tagName.toLowerCase() === "hr") {
-        // Week ended!
         state.activeWeek = false;
       }
     });

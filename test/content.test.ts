@@ -12,23 +12,22 @@ const BOLD = "\x1b[1m";
 interface MenuEndpoint {
   path: string;
   name: string;
-  dataPath?: "data" | "root";
 }
 
 const MENU_ENDPOINTS: MenuEndpoint[] = [
   { path: "/asikkala/menu", name: "Asikkala" },
-  { path: "/syk/menu", name: "SYK" },
+  // { path: "/syk/menu", name: "SYK" },
   { path: "/tyk/menu", name: "TYK" },
   { path: "/mayk/menu", name: "MAYK" },
   { path: "/steiner/menu", name: "Steiner" },
   { path: "/pyhtaa/menu", name: "Pyhtää" },
   { path: "/phyk/menu", name: "PHYK" },
-  { path: "/poytyaps/menu", name: "Pöytyä PS" },
+  // { path: "/poytyaps/menu", name: "Pöytyä PS" },
   { path: "/kauhajoki/menu", name: "Kauhajoki" },
   { path: "/mantsala/menu", name: "Mäntsälä" },
   { path: "/kastelli/menu", name: "Kastelli" },
   { path: "/ael/menu", name: "AEL" },
-  { path: "/krtpl/menu", name: "Tampere Airport" },
+  // { path: "/krtpl/menu", name: "Tampere Airport" },
   { path: "/loviisa/paivakoti/menu", name: "Loviisa pk" },
 ];
 
@@ -51,7 +50,7 @@ function fetchJSON(path: string): Promise<{ status: number; body: any }> {
 }
 
 function countContent(body: any): { days: number; meals: number; sample: string | null } {
-  const menu = body?.data?.menu ?? body?.menu ?? [];
+  const menu = body?.menu ?? [];
   if (!Array.isArray(menu)) return { days: 0, meals: 0, sample: null };
 
   let totalMeals = 0;
@@ -100,7 +99,7 @@ async function testJamixContent(): Promise<void> {
   const start = Date.now();
   try {
     const { body: listBody } = await fetchJSON("/jamix/restaurants");
-    const restaurants = listBody?.data?.restaurants ?? [];
+    const restaurants = listBody?.restaurants ?? [];
     const kitchenCount = restaurants.reduce(
       (sum: number, c: any) => sum + (c.kitchens?.length ?? 0),
       0,
