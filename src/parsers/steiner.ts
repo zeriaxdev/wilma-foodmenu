@@ -3,12 +3,12 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { Diet } from "../models/Diet";
+import { parseDM, formatLocalISO } from "../utils/date";
 
 const dayDateRegex = /^(?:MA|TI|KE|TO|PE)\s+(\d+\.\d+)\./;
 const dietRegex = /([A-Z]+)=(\S+)/g;
@@ -28,7 +28,7 @@ export function parse(
 
     const dateMatch = dayDateRegex.exec(text);
     if (dateMatch) {
-      const date = moment(dateMatch[1], "D.M").startOf("day").format();
+      const date = formatLocalISO(parseDM(dateMatch[1]));
       const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
 
       const meals: Meal[] = [];

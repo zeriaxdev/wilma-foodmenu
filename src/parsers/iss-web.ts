@@ -5,11 +5,11 @@
 import { Day } from "../models/Day";
 import { Diet } from "../models/Diet";
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { ISSRestaurant } from "../models/iss/ISSRestaurant";
+import { parseDM, formatLocalISO } from "../utils/date";
 
 const dateRegex = /([0-9]+).([0-9]+)/;
 
@@ -35,8 +35,7 @@ export function parse(
       let date: any = null;
       let regexResult = dateElem ? dateRegex.exec(dateElem.text) : null;
       if (regexResult != null && regexResult[0] != null) {
-        let momentDate = moment(regexResult[0], "DD.MM").startOf("day");
-        date = momentDate.format();
+        date = formatLocalISO(parseDM(regexResult[0]));
       }
 
       let meals: Meal[] = [];

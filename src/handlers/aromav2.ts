@@ -27,7 +27,6 @@ import { MemoryStorage } from "node-ts-cache-storage-memory";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
 import { Options } from "selenium-webdriver/chrome";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Cookies } from "needle";
 
@@ -485,9 +484,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
     let { days, diets } = await fetchDate("1");
     // Fetch next week, if it's necessary. Otherwise, skip it.
     if (
-      days.filter((i) => {
-        return moment().isBefore(moment(i.date));
-      }).length < 1
+      days.filter((i) => new Date() < new Date(i.date)).length < 1
     ) {
       let { days: days1, diets: diets1 } = await fetchDate("2");
       days1.forEach((item) => days.push(item));

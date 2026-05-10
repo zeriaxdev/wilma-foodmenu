@@ -3,45 +3,37 @@
  */
 
 import * as parser from 'node-html-parser'
-import moment from 'moment';
 import { Day } from "../models/Day";
-import { Moment } from "moment/moment";
 import { Menu } from "../models/Menu";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
 import { Meal } from "../models/Meal";
+import { dateFromISOWeek, formatLocalISO } from "../utils/date";
 
 const dateRegex = /\b[A-Z].*?\b/;
 const type = "mayk";
 
-function convertDayName(name: string) {
+function dayNameToISOWeekday(name: string): number {
     switch (name) {
-        case 'maanantai':
-            return 'monday';
-        case 'tiistai':
-            return 'tuesday';
-        case 'keskiviikko':
-            return 'wednesday';
-        case 'torstai':
-            return 'thursday';
-        case 'perjantai':
-            return 'friday';
-        default:
-            return '';
+        case 'maanantai': return 1;
+        case 'tiistai': return 2;
+        case 'keskiviikko': return 3;
+        case 'torstai': return 4;
+        case 'perjantai': return 5;
+        default: return 0;
     }
 }
 
 export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined {
     let document = parser.parse(html);
 
-    let currentDayDate: undefined | Moment = undefined;
+    let currentDayDate: string | undefined = undefined;
     let weekElement = document.querySelector(".ruokalista-viikko");
     let week = weekElement?.textContent || null;
 
     let contentBox = document.querySelector(".ruoka-template");
     if (contentBox !== null) {
         let items: Day[] = [];
-        let weekdays: string[] = [];
         let children = document.querySelectorAll('.ruoka-template-header');
 
         children.forEach(child => {
@@ -50,14 +42,13 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
                 let dayText = day.textContent;
                 if (dayText) {
                     let regexResult = dateRegex.exec(dayText);
-
                     if (regexResult != null && week) {
-                        weekdays.push(regexResult[0]);
-
-                        for (let i = 0; i < weekdays.length; i++) {
-                            let newDay = convertDayName(weekdays[i].toLowerCase());
-
-                            currentDayDate = moment().day(newDay).week(parseInt(week, 10)).startOf('day');
+                        const weekday = dayNameToISOWeekday(regexResult[0].toLowerCase());
+                        if (weekday > 0) {
+                            const year = new Date().getFullYear();
+                            currentDayDate = formatLocalISO(
+                                dateFromISOWeek(year, parseInt(week, 10), weekday)
+                            );
                         }
                     }
                 }
@@ -83,8 +74,8 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
                 }
             });
 
-            if (meals.length > 0) {
-                items.push(new Day(currentDayDate!.toISOString(true), [new Menu('Lounas', meals)]));
+            if (meals.length > 0 && currentDayDate) {
+                items.push(new Day(currentDayDate, [new Menu('Lounas', meals)]));
             }
             currentDayDate = undefined;
         });

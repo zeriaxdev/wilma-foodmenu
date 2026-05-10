@@ -3,12 +3,12 @@
  */
 
 import * as parser from "node-html-parser";
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
 import { Menu } from "../models/Menu";
+import { parseDMY, formatLocalISO } from "../utils/date";
 
 const type = "looki";
 const dateRegex = /[0-9]{2}.[0-9]{2}.[0-9]+/;
@@ -65,9 +65,7 @@ export function parse(
         let dateRegexp = dateRegex.exec(boxContent);
         if (dateRegexp !== undefined && dateRegexp !== null) {
           let dateFF = dateRegexp[0];
-          currentDate = moment(dateFF, "DD.MM.YYYY")
-            .startOf("day")
-            .toISOString(true);
+          currentDate = formatLocalISO(parseDMY(dateFF));
         }
       } else if (currentDate !== undefined) {
         if (boxContent.match(groupRegex)) {

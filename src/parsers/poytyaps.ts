@@ -3,12 +3,12 @@
  */
 
 import * as parser from 'node-html-parser'
-import moment from 'moment';
 import {Day} from "../models/Day";
 import {HashUtils} from "../crypto/hash";
 import {Diet} from "../models/Diet";
 import * as he from 'he';
 import {HTMLElement, TextNode} from "node-html-parser";
+import {parseDM, formatLocalISO} from "../utils/date";
 
 const dateRegex = /([0-9]+).([0-9]+)/;
 const type = "poytyaps";
@@ -26,7 +26,7 @@ export function parse(html: string): {menu: Day[], diets: Diet[]}|undefined {
                 if (date && date.match(dateRegex)) {
                     let regexResult = dateRegex.exec(date);
                     if (regexResult !== null) {
-                        let ISODate = moment(regexResult[0], "DD.MM.YYYY").startOf('day').toISOString(true);
+                        let ISODate = formatLocalISO(parseDM(regexResult[0]));
                         let reconstructedContent = '';
                         columns[2].childNodes.forEach(textElem => {
                             if (textElem instanceof HTMLElement && textElem.tagName.toLowerCase() === 'br') {

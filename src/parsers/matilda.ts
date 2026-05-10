@@ -1,9 +1,9 @@
 import * as parser from "node-html-parser";
 import { Day } from "../models/Day";
-import moment from "moment";
 import { Menu } from "../models/Menu";
 import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
+import { startOfDay, formatLocalISO } from "../utils/date";
 
 const type = "aromiv2";
 
@@ -26,7 +26,7 @@ export async function parseMatildaModel(json: any) {
   }
 
   for (let key of Object.keys(daysMap)) {
-    let date = moment(key);
+    let date = startOfDay(new Date(key));
     let menus: Menu[] = [];
     for (let i of daysMap[key]) {
       let meal = new Meal(
@@ -41,7 +41,7 @@ export async function parseMatildaModel(json: any) {
       let menu = new Menu(i.name ?? "Lounas", [meal]);
       menus.push(menu);
     }
-    days.push(new Day(date.startOf("day").format(), menus));
+    days.push(new Day(formatLocalISO(date), menus));
   }
   return days;
 }

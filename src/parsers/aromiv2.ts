@@ -2,7 +2,6 @@
  * Copyright (c) 2022 wilmaplus-foodmenu, developed by @developerfromjokela, for Wilma Plus mobile app
  */
 
-import moment from "moment";
 import { Day } from "../models/Day";
 import { Menu } from "../models/Menu";
 import { Meal } from "../models/Meal";
@@ -12,6 +11,7 @@ import { removeImagesFromPDF } from "../utils/pdf";
 import * as parser from "node-html-parser";
 import { Restaurant } from "../models/Restaurant";
 import logger from "../utils/logger";
+import { parseDMY, formatLocalISO } from "../utils/date";
 
 const pdfParser = require("pdfreader");
 
@@ -111,7 +111,7 @@ export async function parse(
                   days.push(new Day(lastDate, tempMenuList));
                   tempMenuList = [];
                 }
-                lastDate = moment(regexResult[0], "DD.MM.YYYY").startOf("day").format();
+                lastDate = formatLocalISO(parseDMY(regexResult[0]));
               }
             } else if (lastDate != null) {
               for (let meal of item) {
@@ -241,7 +241,7 @@ export async function parseRSSFeed(content: any) {
           if (title.match(dateRegex)) {
             let dateResults = dateRegex.exec(title);
             if (dateResults) {
-              let date = moment(dateResults[0], "DD.MM.YYYY").startOf("day").format();
+              let date = formatLocalISO(parseDMY(dateResults[0]));
               days.push(new Day(date, tempMenuList));
             }
           }

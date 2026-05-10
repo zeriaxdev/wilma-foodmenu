@@ -27,7 +27,6 @@
     "ghostscript-node": "github:developerfromjokela/ghostscript-node",
     "he": "^1.2.0",
     "ical-expander": "^3.1.0",
-    "moment": "2.29.4",
     "needle": "^3.3.1",
     "node-html-parser": "^6.1.13",
     "node-ts-cache": "^4.2.3",
