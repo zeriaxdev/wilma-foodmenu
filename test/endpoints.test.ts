@@ -80,20 +80,20 @@ const ENDPOINTS: EndpointSpec[] = [
 
   // Schools
   { path: "/asikkala/menu", category: "school", validateShape: validateMenuShape },
-  { path: "/syk/menu", category: "school", validateShape: validateMenuShape },
+  // { path: "/syk/menu", category: "school", validateShape: validateMenuShape },
   { path: "/tyk/menu", category: "school", validateShape: validateMenuShape },
   { path: "/mayk/menu", category: "school", validateShape: validateMenuShape },
   { path: "/steiner/menu", category: "school", validateShape: validateMenuShape },
   { path: "/pyhtaa/menu", category: "school", validateShape: validateMenuShape },
   { path: "/phyk/menu", category: "school", validateShape: validateMenuShape },
-  { path: "/poytyaps/menu", category: "school", validateShape: validateMenuShape },
+  // { path: "/poytyaps/menu", category: "school", validateShape: validateMenuShape },
   { path: "/kauhajoki/menu", category: "school", validateShape: validateMenuShape },
   { path: "/mantsala/menu", category: "school", validateShape: validateMenuShape },
 
   // Restaurants
   { path: "/kastelli/menu", category: "restaurant", validateShape: validateMenuShape },
   { path: "/ael/menu", category: "restaurant", validateShape: validateMenuShape },
-  { path: "/krtpl/menu", category: "restaurant", validateShape: validateMenuShape },
+  // { path: "/krtpl/menu", category: "restaurant", validateShape: validateMenuShape },
 
   // Daycare
   { path: "/loviisa/paivakoti/menu", category: "daycare", validateShape: validateMenuShape },
