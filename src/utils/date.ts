@@ -2,6 +2,19 @@
  * Native date utilities — replaces moment.js
  */
 
+/**
+ * Returns the simulated "now" date if SIMULATE_DATE env var is set (YYYY-MM-DD),
+ * otherwise returns the real current date.
+ */
+export function getNow(): Date {
+  const sim = process.env.SIMULATE_DATE;
+  if (sim) {
+    const [y, m, d] = sim.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date();
+}
+
 export function formatLocalISO(date: Date): string {
   const pad = (n: number, len = 2) => String(n).padStart(len, "0");
   const offset = -date.getTimezoneOffset();
@@ -31,7 +44,7 @@ export function parseDM(str: string): Date {
   const parts = str.split(".");
   const day = parseInt(parts[0], 10);
   const month = parseInt(parts[1], 10) - 1;
-  const year = new Date().getFullYear();
+  const year = getNow().getFullYear();
   return new Date(year, month, day);
 }
 

@@ -7,6 +7,7 @@ import { Http } from "../net/http";
 import { errorResponse, responseStatus } from "../utils/response_utilities";
 import { parse } from "../parsers/kastelli";
 
+// Server intermittently resets connections (ECONNRESET)
 const url = "https://mantsala.ravintolapalvelut.iss.fi/mantsalan-koulu";
 let httpClient = new Http();
 

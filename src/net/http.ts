@@ -9,9 +9,11 @@ import { NeedleCaching } from "../caching/needle";
 
 export class Http {
   cache: NeedleCaching;
+  private options: needle.NeedleOptions;
 
-  constructor() {
+  constructor(options?: needle.NeedleOptions) {
     this.cache = new NeedleCaching(new CacheContainer(new MemoryStorage()));
+    this.options = { follow_max: 5, ...options };
   }
 
   /**
@@ -28,7 +30,7 @@ export class Http {
       (content) => {
         if (content) callback(null, content);
         else {
-          needle.get(url, { follow_max: 5 }, (error, response) => {
+          needle.get(url, this.options, (error, response) => {
             if (error) {
               callback(error, response);
               return;

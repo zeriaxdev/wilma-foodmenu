@@ -8,7 +8,7 @@ import { Diet } from "../models/Diet";
 import icsToJson from "ics-to-json";
 const IcalExpander = require("ical-expander");
 import { HashUtils } from "../crypto/hash";
-import { startOfISOWeek, addDays, formatLocalISO, startOfDay } from "../utils/date";
+import { startOfISOWeek, addDays, formatLocalISO, startOfDay, getNow } from "../utils/date";
 const type = "kauhajoki";
 
 /**
@@ -19,7 +19,7 @@ export function parse(
   content: string
 ): { menu: Day[]; diets: Diet[] } | undefined {
   let days: Day[] = [];
-  const now = new Date();
+  const now = getNow();
   let rangeStart = addDays(startOfISOWeek(now), -7);
   let rangeEnd = addDays(startOfISOWeek(now), 20);
   const icalExpander = new IcalExpander({ ics: content });

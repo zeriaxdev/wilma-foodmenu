@@ -9,66 +9,82 @@ import { Meal } from "../models/Meal";
 import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { ISSRestaurant } from "../models/iss/ISSRestaurant";
-import { parseDM, formatLocalISO } from "../utils/date";
-
-const dateRegex = /([0-9]+).([0-9]+)/;
+import { formatLocalISO } from "../utils/date";
+import he from "he";
 
 export function parse(
   html: string,
   type: string
 ): { menu: Day[]; diets: Diet[] } | undefined {
   let document = parser.parse(html);
-  // Correcting heart icon
-  let sm = document.querySelectorAll('i[class="sydanmerkki"]');
-  for (let smIcon of sm) {
-    if (smIcon != null) smIcon.set_content("❤");
-  }
+  let container = document.querySelector(".restaurant_menu_container");
+  if (!container) return undefined;
+
   let items: Day[] = [];
-  let cards = document
-    .querySelectorAll('div[class^="lunch-menu__day"]')
-    .slice(1);
-  if (cards != null) {
-    for (let card of cards) {
-      let pElem = card.querySelectorAll("p");
-      let dateElem = card.querySelector("h2");
+  let diets: Diet[] = [];
+  let seenDiets = new Set<string>();
 
-      let date: any = null;
-      let regexResult = dateElem ? dateRegex.exec(dateElem.text) : null;
-      if (regexResult != null && regexResult[0] != null) {
-        date = formatLocalISO(parseDM(regexResult[0]));
+  let dayContainers = container.querySelectorAll(".day_menu_container");
+  for (let dayEl of dayContainers) {
+    let dateAttr = dayEl.getAttribute("data-date");
+    if (!dateAttr) continue;
+
+    let [year, month, day] = dateAttr.split("-").map(Number);
+    let date = new Date(year, month - 1, day);
+    let dateStr = formatLocalISO(date);
+
+    let menuSections: Menu[] = [];
+    let currentMenuName: string | null = null;
+    let currentMeals: Meal[] = [];
+
+    for (let child of dayEl.childNodes) {
+      if (!(child instanceof parser.HTMLElement)) continue;
+
+      if (child.classList.contains("name_price_container")) {
+        if (currentMenuName && currentMeals.length > 0) {
+          menuSections.push(new Menu(currentMenuName, currentMeals));
+          currentMeals = [];
+        }
+        let h3 = child.querySelector("h3");
+        currentMenuName = h3?.text.trim() || "Lounas";
+      } else if (child.classList.contains("menu_item_container")) {
+        let nameEl = child.querySelector(".menu_item_name");
+        if (nameEl) {
+          let name = he.decode(nameEl.text).replace(/\s+/g, " ").trim();
+          if (name) {
+            currentMeals.push(
+              new Meal(HashUtils.sha1Digest(type + "_" + name), name)
+            );
+          }
+        }
+
+        let dietEls = child.querySelectorAll(".diet");
+        for (let dietEl of dietEls) {
+          let title = dietEl.getAttribute("title");
+          let code = dietEl.classNames
+            .split(" ")
+            .find((c: string) => c.startsWith("diet_"))
+            ?.replace("diet_", "");
+          if (code && title && !seenDiets.has(code)) {
+            seenDiets.add(code);
+            diets.push(new Diet(code, title));
+          }
+        }
       }
-
-      let meals: Meal[] = [];
-      pElem.forEach((item) => {
-        meals.push(
-          new Meal(
-            HashUtils.sha1Digest(type + "_" + item.text.trim()),
-            item.text
-          )
-        );
-      });
-
-      if (date != null) items.push(new Day(date, [new Menu("Lounas", meals)]));
     }
-    // Get nutrition details
-    let nutritionDiv = document.querySelector('div[class="nutrition-details"]');
-    let nutritionText = nutritionDiv?.querySelector("p") ?? null;
 
-    // Sort by date to fix sorting if multiple weeks are present. Parser does not follow orders
-    // specified in HTML, so we fix that by manually sorting all items by date.
-    items.sort((a, b) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-
-    let diets: Diet[] = [];
-    for (let item of (nutritionText?.text ?? "").split(",")) {
-      let split = item.split("=");
-      if (split.length < 2 || !split[0]?.trim() || !split[1]?.trim()) continue;
-      diets.push(new Diet(split[0].trim(), split[1].trim()));
+    if (currentMenuName && currentMeals.length > 0) {
+      menuSections.push(new Menu(currentMenuName, currentMeals));
     }
-    return { menu: items, diets: diets };
+
+    if (menuSections.length > 0) {
+      items.push(new Day(dateStr, menuSections));
+    }
   }
-  return undefined;
+
+  items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return { menu: items, diets: diets };
 }
 
 export function parseList(html: string): ISSRestaurant[] {

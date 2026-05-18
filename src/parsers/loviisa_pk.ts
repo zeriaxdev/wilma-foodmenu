@@ -9,7 +9,7 @@ import { HashUtils } from "../crypto/hash";
 import { Menu } from "../models/Menu";
 import { removeImagesFromPDF } from "../utils/pdf";
 import logger from "../utils/logger";
-import { dateFromISOWeek, formatLocalISO, getISOWeek } from "../utils/date";
+import { dateFromISOWeek, formatLocalISO, getISOWeek, getNow } from "../utils/date";
 const pdfParser = require("pdfreader");
 
 const type = "loviisa_pk";
@@ -110,10 +110,10 @@ export async function parse(
         weekBundles.forEach((bundle) => {
           bundle.weeks.forEach((week) => {
             bundle.meals.forEach((meal) => {
-              const year = new Date().getFullYear();
+              const year = getNow().getFullYear();
               const weekday = dayAbbrevToWeekday(meal.day);
               if (weekday === 0) return;
-              logger.debug({ currentWeek: getISOWeek(new Date()), targetWeek: week }, "Loviisa: processing week");
+              logger.debug({ currentWeek: getISOWeek(getNow()), targetWeek: week }, "Loviisa: processing week");
               const dateStr = formatLocalISO(dateFromISOWeek(year, week, weekday));
               let mainMeals = [];
               if (meal.meal)

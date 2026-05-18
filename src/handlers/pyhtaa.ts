@@ -8,7 +8,8 @@ import { errorResponse, responseStatus } from "../utils/response_utilities";
 import { parse } from "../parsers/pyhtaa";
 
 const url = "https://pyhtaa.fi/fi/lounaslista-koulut";
-let httpClient = new Http();
+// Server has incomplete certificate chain — skip TLS verification
+let httpClient = new Http({ rejectUnauthorized: false });
 
 /**
  * @swagger

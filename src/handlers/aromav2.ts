@@ -4,6 +4,7 @@
 
 import { Request, Response } from "express";
 import { responseStatus } from "../utils/response_utilities";
+import { getNow } from "../utils/date";
 import logger from "../utils/logger";
 import {
   Builder,
@@ -484,7 +485,7 @@ export async function getRestaurantPage(req: Request, res: Response) {
     let { days, diets } = await fetchDate("1");
     // Fetch next week, if it's necessary. Otherwise, skip it.
     if (
-      days.filter((i) => new Date() < new Date(i.date)).length < 1
+      days.filter((i) => getNow() < new Date(i.date)).length < 1
     ) {
       let { days: days1, diets: diets1 } = await fetchDate("2");
       days1.forEach((item) => days.push(item));

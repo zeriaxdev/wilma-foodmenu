@@ -8,7 +8,7 @@ import { Menu } from "../models/Menu";
 import { HashUtils } from "../crypto/hash";
 import { Diet } from "../models/Diet";
 import { Meal } from "../models/Meal";
-import { dateFromISOWeek, formatLocalISO } from "../utils/date";
+import { dateFromISOWeek, formatLocalISO, getNow } from "../utils/date";
 
 const dateRegex = /\b[A-Z].*?\b/;
 const type = "mayk";
@@ -45,7 +45,7 @@ export function parse(html: string): { menu: Day[], diets: Diet[] } | undefined 
                     if (regexResult != null && week) {
                         const weekday = dayNameToISOWeekday(regexResult[0].toLowerCase());
                         if (weekday > 0) {
-                            const year = new Date().getFullYear();
+                            const year = getNow().getFullYear();
                             currentDayDate = formatLocalISO(
                                 dateFromISOWeek(year, parseInt(week, 10), weekday)
                             );
