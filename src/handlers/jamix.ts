@@ -244,18 +244,22 @@ export async function getMenuOptions(req: Request, res: Response) {
 
 /**
  * Transform raw Jamix search response into the Swagger-documented structure.
- * Preserves the nested customerId → kitchens hierarchy.
+ * Preserves the nested customerId → kitchens hierarchy. Customers whose
+ * `kitchens` is missing or not an array are dropped — upstream occasionally
+ * returns placeholder entries that would otherwise crash downstream consumers.
  */
 function extractRestaurants(data: JamixSearchResponse[]): CustomerRestaurant[] {
-  return data.map((customer) => ({
-    customerId: customer.customerId,
-    kitchens: customer.kitchens.map((k) => ({
-      kitchenName: k.kitchenName,
-      kitchenId: k.kitchenId,
-      address: k.address,
-      city: k.city,
-    })),
-  }));
+  return data
+    .filter((c) => c && Array.isArray(c.kitchens))
+    .map((customer) => ({
+      customerId: customer.customerId,
+      kitchens: customer.kitchens.map((k) => ({
+        kitchenName: k.kitchenName,
+        kitchenId: k.kitchenId,
+        address: k.address,
+        city: k.city,
+      })),
+    }));
 }
 
 /**
@@ -269,11 +273,12 @@ function filterRestaurants(
   const results: CustomerRestaurant[] = [];
 
   for (const customer of restaurants) {
+    if (!Array.isArray(customer.kitchens)) continue;
     const matchingKitchens = customer.kitchens.filter(
       (k) =>
-        k.kitchenName.toLowerCase().includes(query) ||
-        k.address.toLowerCase().includes(query) ||
-        k.city.toLowerCase().includes(query),
+        (k.kitchenName ?? "").toLowerCase().includes(query) ||
+        (k.address ?? "").toLowerCase().includes(query) ||
+        (k.city ?? "").toLowerCase().includes(query),
     );
 
     if (matchingKitchens.length > 0) {

@@ -210,16 +210,18 @@ async function runJamixMenuTest(): Promise<TestResult> {
     }
 
     const restaurants = body.restaurants || [];
-    if (restaurants.length === 0 || restaurants[0].kitchens?.length === 0) {
+    const customer = restaurants.find(
+      (r: any) => Array.isArray(r?.kitchens) && r.kitchens.length > 0,
+    );
+    if (!customer) {
       return {
         endpoint,
         status: "skip",
         duration: Date.now() - start,
-        error: "No Jamix restaurants available",
+        error: "No Jamix restaurants with kitchens available",
       };
     }
 
-    const customer = restaurants[0];
     const kitchen = customer.kitchens[0];
     const menuPath = `/jamix/menu/${customer.customerId}/${kitchen.kitchenId}`;
 
@@ -262,6 +264,7 @@ async function runJamixSearchTest(): Promise<TestResult> {
 
     const restaurants = body.restaurants || [];
     for (const customer of restaurants) {
+      if (!Array.isArray(customer.kitchens)) continue;
       for (const kitchen of customer.kitchens) {
         const match =
           kitchen.kitchenName?.toLowerCase().includes("espoo") ||
