@@ -2,6 +2,10 @@
  * Stateless Streamable HTTP transport mounted on the Express app at /mcp.
  * A fresh transport + server is created per request — simplest for stateless
  * tool calls, and avoids cross-request state.
+ *
+ * The loopback baseUrl is derived from req.socket.localPort so callers don't
+ * have to plumb the bound port through at startup (which made the test suite
+ * dependent on an external server bound to a known port).
  */
 
 import { Request, Response } from "express";
@@ -9,8 +13,11 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import logger from "../utils/logger";
 import { createMcpServer } from "./server";
 
-export function mcpHttpHandler(baseUrl: string) {
+export function mcpHttpHandler() {
   return async (req: Request, res: Response) => {
+    const port = req.socket.localPort;
+    const baseUrl = `http://127.0.0.1:${port}`;
+
     const server = createMcpServer(baseUrl);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
