@@ -14,13 +14,15 @@
     "test": "ts-node --project test/tsconfig.json test/endpoints.test.ts",
     "test:jamix": "ts-node --project test/tsconfig.json test/endpoints.test.ts jamix",
     "test:schools": "ts-node --project test/tsconfig.json test/endpoints.test.ts school",
-    "test:content": "ts-node --project test/tsconfig.json test/content.test.ts"
+    "test:content": "ts-node --project test/tsconfig.json test/content.test.ts",
+    "test:mcp": "ts-node --project test/tsconfig.json test/mcp.test.ts"
   },
   "keywords": [],
   "author": "",
   "license": "GPL-2.0",
   "repository": "https://github.com/zeriaxdev/wilma-foodmenu",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@scalar/express-api-reference": "^0.8.47",
     "body-parser": "^1.19.0",
     "express": "^4.18.3",
@@ -34,7 +36,8 @@
     "pdfreader": "^3.0.8",
     "pino": "^10.3.1",
     "selenium-webdriver": "^4.43.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

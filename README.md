@@ -66,6 +66,7 @@ The server runs on port 3000 by default. Interactive API documentation is availa
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/menus` | List all available menu providers |
+| POST | `/mcp` | Model Context Protocol endpoint ([details](#model-context-protocol)) |
 
 ### Schools
 
@@ -122,6 +123,19 @@ Jamix menus include meal names, dietary codes, ingredients, and portion sizes.
 |--------|------|-------------|
 | GET | `/aroma/:url/restaurants` | List restaurants for an Aromi instance |
 | GET | `/aroma/:url/restaurants/:id` | Get menu for an Aromi restaurant |
+
+### Model Context Protocol
+
+The service also exposes a Model Context Protocol server at `POST /mcp` using
+the Streamable HTTP transport. Compatible MCP clients (e.g. Claude Desktop,
+agent frameworks) can connect and call the menu data as tools:
+
+| Tool | Description |
+|------|-------------|
+| `list_menu_providers` | List all configured providers |
+| `get_menu` | Fetch the menu for a provider with a static endpoint |
+| `search_jamix_restaurants` | Search Jamix kitchens by name/address/city |
+| `get_jamix_menu` | Fetch a Jamix menu (supports date range and language) |
 
 ## Maintainers
 
