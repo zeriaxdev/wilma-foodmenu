@@ -131,8 +131,7 @@ app.get("/jamix/menu/:customerId/:kitchenId", jamix.getRestaurantPage);
 app.get("/menus", menuList.getMenuList);
 
 // MCP (Model Context Protocol) — Streamable HTTP transport, stateless
-const mcp = mcpHttpHandler(`http://127.0.0.1:${PORT}`);
-app.post("/mcp", mcp);
+app.post("/mcp", mcpHttpHandler());
 app.get("/mcp", (_req, res) =>
   res.status(405).json({ status: false, cause: "Method Not Allowed" }),
 );
