@@ -37,6 +37,7 @@ const matilda = require("./handlers/matilda");
 const loviisa = require("./handlers/loviisa_pk");
 const jamix = require("./handlers/jamix");
 const menuList = require("./handlers/menu_list");
+import { mcpHttpHandler } from "./mcp/http";
 
 (global as any).seleniumArgs = SELENIUM_ARGS;
 
@@ -128,6 +129,16 @@ app.get("/jamix/menu/:customerId/:kitchenId", jamix.getRestaurantPage);
 
 // Menu directory/list endpoint
 app.get("/menus", menuList.getMenuList);
+
+// MCP (Model Context Protocol) — Streamable HTTP transport, stateless
+const mcp = mcpHttpHandler(`http://127.0.0.1:${PORT}`);
+app.post("/mcp", mcp);
+app.get("/mcp", (_req, res) =>
+  res.status(405).json({ status: false, cause: "Method Not Allowed" }),
+);
+app.delete("/mcp", (_req, res) =>
+  res.status(405).json({ status: false, cause: "Method Not Allowed" }),
+);
 
 /**
  * @swagger
